@@ -9,7 +9,6 @@ Description: A structural transformation model for a latent, quasi-independent
     Kendall's tau (Martin and Betensky, 2005) <doi:10.1198/016214504000001538>.
     The marginal distribution for the truncation time and the event time are
     completely left unspecified.
-Depends: R (>= 3.4.4)
 License: GPL (>= 3)
 URL: http://github.com/stc04003/tranSurv
 BugReports: http://github.com/stc04003/tranSurv/issues

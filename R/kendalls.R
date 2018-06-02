@@ -137,12 +137,12 @@ condKendall <- function(trun, obs, delta = NULL, method = "MB",
     }
     res <- vector("double", 2)
     if (method != "IPW2") {
-        tmp <- .C("condKendall", as.double(trun), as.double(obs), as.double(delta),
+        tmp <- .C("condKendallC", as.double(trun), as.double(obs), as.double(delta),
                   as.integer(n), as.double(weights), as.integer(which(method == methName)), 
                   tmp = as.double(res), PACKAGE = "tranSurv")$tmp
     } else {
         event <- delta == 1
-        tmp <- .C("condKendall", as.double(trun[event]), as.double(obs[event]),
+        tmp <- .C("condKendallC", as.double(trun[event]), as.double(obs[event]),
                   as.double(delta[event]), as.integer(sum(event)), as.double(weights[rep(event, 2)]),
                   as.integer(which(method == methName)), 
                   tmp = as.double(res), PACKAGE = "tranSurv")$tmp

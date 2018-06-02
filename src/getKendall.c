@@ -18,7 +18,7 @@ void uCondKendall(double *x, double *y, int *n, double *out) {
   out;
 }
 
-void condKendall(double *t1, double *t2, double *d, int *n, double *weights, 
+void condKendallC(double *t1, double *t2, double *d, int *n, double *weights, 
 		    int *meth, double *out) {
   int i, j, k;
   double *bb = Calloc(*n * (*n - 1), double);
@@ -71,7 +71,7 @@ void condKendall(double *t1, double *t2, double *d, int *n, double *weights,
   out;
 }
 
-void pmcc(double *t1, double *t2, int *n, double *out) {
+void pmccC(double *t1, double *t2, int *n, double *out) {
   int i, j, k;
   double STT = 0.0;
   double SXT = 0.0;

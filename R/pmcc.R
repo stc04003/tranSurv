@@ -46,7 +46,7 @@ pmcc <- function(trun, obs, a = 0, trans = "linear") {
     }
     trun <- mapply(FUN, X = obs, T = trun, a = a)
     res <- vector("double", 2)
-    pmc <- .C("pmcc", as.double(trun), as.double(obs), as.integer(n),
+    pmc <- .C("pmccC", as.double(trun), as.double(obs), as.integer(n),
               tmp = as.double(res), PACKAGE = "tranSurv")$tmp
     out$PE <- pmc[1]
     out$SE <- pmc[2]
