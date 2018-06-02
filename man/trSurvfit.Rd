@@ -71,7 +71,7 @@ datgen <- function(n) {
     X <- rweibull(n, 2, 4) ## failure times
     U <- rweibull(n, 2, 1) ## latent truncation time
     T <- (1 + a) * U - a * X ## apply transformation
-    C <- rlnorm(n, .8, 1) ## censoring
+    C <- 10 ## censoring
     dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C))
     return(subset(dat, trun <= obs))
 }
