@@ -1,0 +1,94 @@
+---
+title: Conditional Kendall's tau with perturbation weights
+author: Steven Chiou
+geometry: left = .5in, right = .5in, top = 1in, bottom = .6in
+urlcolor: blue
+output: pdf_document
+---
+
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = NA, 
+  prompt = TRUE,
+  fig.path = "README-"
+)
+```
+
+Install *tranSurv* package from GitHub using 
+```{r github, eval = FALSE}
+devtools::install_github("stc04003/tranSurv")
+```
+
+
+Load *tranSurv* and *copula* packages.
+```{r library}
+library(tranSurv)
+library(copula)
+``` 
+
+Generating correlated data:
+```{r generate}
+set.seed(1)
+rho <- iTau(normalCopula(dim = 2), .5) ## convert kendall's tau to pearson's rho
+u <- rCopula(2000, normalCopula(rho, dim = 2)) ## generate correlated data
+u <- qweibull(u, 2, 1) ## assumes t1 and t2 follows some weibull distribution
+colnames(u) <- c("t1", "t2")
+```
+
+This gives a Kendall's tau of 0.5 (between *t1* and *t2*)
+```{r kendall}
+cor(u, method = "kendall")
+kendall(u)
+```
+
+Now apply the truncation
+```{r truncation}
+u <- subset(as.data.frame(u), t1 < t2) 
+dim(u) ## ~50% truncation rate because t1 and t2 follows the same distribution
+head(u)
+```
+
+Arguments for *wKendall*:
+```{r wKendall}
+args(wKendall)
+```
+
+When there is no perturbation weights, *wKendall* is equivalent to *condKendall*.
+```{r condKendall}
+attach(u)
+condKendall(t1, t2)$PE
+wKendall(t1, t2)
+detach(u)
+```
+
+*wKendall* with perturbation weight, which assumes to be a standard exponential distribution.
+```{r perturbation}
+with(u, wKendall(t1, t2, NULL, rexp(length(t1))))
+```
+
+Use perturbation weights for standard error estimation:
+```{r se}
+attach(u)
+set.seed(2)
+sd(replicate(500, wKendall(t1, t2, NULL, rexp(length(t1))))) ## 0.018
+condKendall(t1, t2)$SE ## 0.208
+detach(u)
+```
+
+Small scale simulation:
+```{r simu-se, cache = TRUE}
+do <- function() {
+    u <- rCopula(2000, normalCopula(rho, dim = 2)) ## generate correlated data
+    u <- qweibull(u, 2, 1) ## assumes t1 and t2 follows some weibull distribution
+    colnames(u) <- c("t1", "t2")
+    u <- subset(as.data.frame(u), t1 < t2)
+    out <- with(u, c(sd(replicate(500, wKendall(t1, t2, NULL, rexp(length(t1))))) ,
+                     condKendall(t1, t2)$SE))
+    out
+}
+
+set.seed(3)
+rowMeans(replicate(100, do())) 
+```
