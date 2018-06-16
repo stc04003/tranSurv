@@ -156,3 +156,4 @@ condKendall <- function(trun, obs, delta = NULL, method = "MB",
     class(out) <- "condKendall"
     out
 }
+
