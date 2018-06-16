@@ -8,9 +8,11 @@
 #' @param weights perturbation weights.
 #' 
 #' @export
-wKendall <- function(trun, obs, weights = NULL) {
+wKendall <- function(trun, obs, delta = NULL, weights = NULL) {
     n <- length(obs)
+    if (is.null(delta)) delta <- rep(1, n)
     if (is.null(weights)) weights <- rep(1, n)
-    .C("wKendallC", as.double(trun), as.double(obs), as.integer(n), as.double(weights),
+    .C("wKendallC", as.double(trun), as.double(obs), as.integer(n),
+       as.double(delta), as.double(weights),
        out = double(1), PACKAGE = "tranSurv")$out
 }

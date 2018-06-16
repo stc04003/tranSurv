@@ -121,16 +121,18 @@ void pmccC(double *t1, double *t2, int *n, double *out) {
 // 
 // t1 = truncation times, t' or t'(a).
 // t2 = failure times
+// d is the censoring indicator for t2
 // n = length(t1) = length(t2)
 // wgt = perturbation weights
-void wKendallC(double *t1, double *t2, int *n, double *wgt, double *out) {
+void wKendallC(double *t1, double *t2, int *n, double *d, double *wgt, double *out) {
   int i, j;
   double Uc = 0; // sum_i sum_j wi * wj * \sgn(...) I(Omega)
   double Um = 0; // sum_i sum_j wi * wj * I(Omega)
   double tmp = 0;
   for (i = 0; i < (*n - 1); i++) {
     for (j = i + 1; j < *n; j++) {
-      if (fmax(t1[i], t1[j]) <= fmin(t2[i], t2[j])) {
+      if (fmax(t1[i], t1[j]) <= fmin(t2[i], t2[j]) &&
+	  d[i] * (t2[i] <= t2[j]) + d[j] * (t2[j] <= t2[i]) > 0) {
 	tmp = (t1[i] - t1[j]) * (t2[i] - t2[j]);
 	Uc += ((tmp > 0) - (tmp < 0)) * wgt[i] * wgt[j];
 	Um += wgt[i] * wgt[j];

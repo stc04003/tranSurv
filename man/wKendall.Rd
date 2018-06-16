@@ -4,7 +4,7 @@
 \alias{wKendall}
 \title{Weighted conditional Kendall's tau}
 \usage{
-wKendall(trun, obs, weights)
+wKendall(trun, obs, delta = NULL, weights = NULL)
 }
 \arguments{
 \item{trun}{left truncation time satisfying \code{trun} <= \code{obs}.}
