@@ -4,6 +4,8 @@ output:
     variant: markdown_github
 ---
 
+## **tranSurv**
+
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.4.4-6666ff.svg)](https://cran.r-project.org/)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tranSurv)](https://cran.r-project.org/package=tranSurv)
@@ -20,7 +22,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-### **tranSurv** implements a collection of methods for survival analysis under a dependent truncation and independent right censoring via a structural transformation method.
+#### transformation model for left-truncated right-censored survival data
+***tranSurv*** implements methods for survival analysis under a dependent truncation and independent right censoring via a structural transformation method.
+The package is still under active development.
 ***
 
 A package that estimates survival curve under a dependent truncation and independent right censoring
