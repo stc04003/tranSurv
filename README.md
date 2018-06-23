@@ -6,7 +6,9 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 #### Transformation model for left-truncated right-censored survival data
 
-***tranSurv*** implements methods for survival analysis under a dependent truncation and independent right censoring via a structural transformation method. The package is still under active development. \*\*\*
+***tranSurv*** implements methods for survival analysis under a dependent truncation and independent right censoring via a structural transformation method. The package is still under active development.
+
+------------------------------------------------------------------------
 
 A package that estimates survival curve under a dependent truncation and independent right censoring via a structural transformation method. The package also includes hypothesis test of quasi-independence based on the conditional Kendall's tau of Martin and Betensky (2005) and two versions of the inverse probability weighted Kendall's tau of Austin and Betensky (2014).
 

@@ -25,7 +25,8 @@ knitr::opts_chunk$set(
 #### Transformation model for left-truncated right-censored survival data
 ***tranSurv*** implements methods for survival analysis under a dependent truncation and independent right censoring via a structural transformation method.
 The package is still under active development.
-***
+
+---
 
 A package that estimates survival curve under a dependent truncation and independent right censoring
 via a structural transformation method.
