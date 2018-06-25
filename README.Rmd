@@ -47,3 +47,5 @@ Install and load the package from GitHub using
 ```{r github, eval = FALSE}
 devtools::install_github("stc04003/tranSurv")
 library(tranSurv)
+```
+
