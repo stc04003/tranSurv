@@ -42,7 +42,7 @@ Install and load the package from CRAN using
 install.packages("tranSurv")
 library(tranSurv)
 ```
- 
+
 Install and load the package from GitHub using 
 ```{r github, eval = FALSE}
 devtools::install_github("stc04003/tranSurv")
