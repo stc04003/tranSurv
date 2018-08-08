@@ -1,6 +1,6 @@
 Package: tranSurv
 Title: Estimating a Survival Distribution in the Presence of Dependent Left Truncation and Right Censoring
-Version: 1.1.6
+Version: 1.1.7
 Authors@R: person("Sy Han (Steven)", "Chiou", email = "schiou@utdallas.edu", role = c("aut", "cre"))
 Description: A structural transformation model for a latent, quasi-independent
     truncation time as a function of the observed dependent truncation

@@ -12,7 +12,6 @@
 #'
 #' @importFrom survival Surv survfit
 #' @importFrom SQUAREM squarem
-#' @importFrom rootSolve uniroot.all
 #' @importFrom graphics abline legend lines par plot points title mtext text
 #' @importFrom stats approx optimize pnorm uniroot coef lm
 #' @importFrom utils head

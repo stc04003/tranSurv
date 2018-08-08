@@ -5,19 +5,18 @@
 // This is a C version of cor(x, y, method = Kendall)
 // n = length(x) = length(y)
 void uCondKendall(double *x, double *y, int *n, double *out) {
-  int i, j;  
+  int i, j;
   double M = 0.0;
   double tmp = 0.0;
   double tau = 0.0;
-  for (int i = 0; i < (*n - 1); i++) {
-    for (int j = (i + 1); j < *n; j++) {
+  for (i = 0; i < (*n - 1); i++) {
+    for (j = (i + 1); j < *n; j++) {
       tmp = (y[i] - y[j]) * (x[i] - x[j]);
       tau += (tmp > 0) - (tmp < 0);
       M += 1;
     }
   }
   out[0] = tau / M;
-  out;
 }
 
 // t1 = truncation times
@@ -30,18 +29,16 @@ void uCondKendall(double *x, double *y, int *n, double *out) {
 // meth = 3: IPW 2 from Austin and Betensky (2014)'s Model 2 in Section 4
 void condKendallC(double *t1, double *t2, double *d, int *n, double *weights, 
 		    int *meth, double *out) {
-  int i, j, k;
+  int i, j;
   double *bb = Calloc(*n * (*n - 1), double);
-  double Uc; 
-  double Um; 
+  double Uc = 0.0; 
+  double Um = 0.0; 
   double tmp;
   double wgt;
   double sgn;
-  double gamma;
   double v = 0.0;
   double v1 = 0.0;
   double v2 = 0.0;
-  double M = 0.0;
   for (i = 0; i < (*n - 1); i++) {
     for (j = i + 1; j < *n; j++) {
       if (fmax(t1[i], t1[j]) <= fmin(t2[i], t2[j]) &&
@@ -78,7 +75,6 @@ void condKendallC(double *t1, double *t2, double *d, int *n, double *weights,
   }
   out[1] = v * *n * (*n - 1) / (Um * Um * (*n - 2));
   Free(bb);
-  out;
 }
 
 // conditionaled Product-moment correlation coefficient for UNCENSORED data
@@ -87,7 +83,7 @@ void condKendallC(double *t1, double *t2, double *d, int *n, double *weights,
 // t2 is the failure time
 // n = length(t1) = length(t2)
 void pmccC(double *t1, double *t2, int *n, double *out) {
-  int i, j, k;
+  int i, j;
   double STT = 0.0;
   double SXT = 0.0;
   double SXX = 0.0;
@@ -113,7 +109,6 @@ void pmccC(double *t1, double *t2, int *n, double *out) {
     out[1] += tmp * tmp;     
   }
   out[1] = out[1] * out[0] * out[0]; 
-  out;
 }
 
 
@@ -140,6 +135,5 @@ void wKendallC(double *t1, double *t2, int *n, double *d, double *wgt, double *o
     }
   }
   out[0] = Uc / Um;
-  out;
 }
 
