@@ -33,9 +33,9 @@ void condKendallC(double *t1, double *t2, double *d, int *n, double *weights,
   double *bb = Calloc(*n * (*n - 1), double);
   double Uc = 0.0; 
   double Um = 0.0; 
-  double tmp;
-  double wgt;
-  double sgn;
+  double tmp = 0.0;
+  double wgt = 0.0;
+  double sgn = 0.0;
   double v = 0.0;
   double v1 = 0.0;
   double v2 = 0.0;
@@ -121,9 +121,9 @@ void pmccC(double *t1, double *t2, int *n, double *out) {
 // wgt = perturbation weights
 void wKendallC(double *t1, double *t2, int *n, double *d, double *wgt, double *out) {
   int i, j;
-  double Uc = 0; // sum_i sum_j wi * wj * \sgn(...) I(Omega)
-  double Um = 0; // sum_i sum_j wi * wj * I(Omega)
-  double tmp = 0;
+  double Uc = 0.0; // sum_i sum_j wi * wj * \sgn(...) I(Omega)
+  double Um = 0.0; // sum_i sum_j wi * wj * I(Omega)
+  double tmp = 0.0;
   for (i = 0; i < (*n - 1); i++) {
     for (j = i + 1; j < *n; j++) {
       if (fmax(t1[i], t1[j]) <= fmin(t2[i], t2[j]) &&
