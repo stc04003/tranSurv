@@ -49,7 +49,7 @@ environment:
     CRAN: http://cran.rstudio.com
 
  - R_VERSION: 3.4.4
-    RTOOLS_VERSION: 32
+    RTOOLS_VERSION: 34
     CRAN: http://cran.rstudio.com
     
 artifacts:
