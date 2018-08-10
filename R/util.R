@@ -1,3 +1,5 @@
+#' @noRd
+#' @keywords internal 
 uniroot.all <- function (f, interval, lower= min(interval), upper= max(interval), ... ) {
     n = 100
     xseq <- seq(lower, upper, len = n + 1)
