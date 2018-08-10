@@ -51,9 +51,6 @@ environment:
   - R_VERSION: 3.4.4
     RTOOLS_VERSION: 33
     CRAN: http://cran.rstudio.com
-
-  matrix:
-    fast_finish: true
   
 artifacts:
   - path: '*.Rcheck\**\*.log'
