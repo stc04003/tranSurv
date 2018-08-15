@@ -23,10 +23,10 @@ The returned value is equivalent to that from \code{cor} with \code{method = "ke
 implemented in C.
 }
 \examples{
-library(copula)
-norm.cop <- normalCopula(iTau(normalCopula(), .5))
+library(MASS)
 set.seed(1)
-dat <- rCopula(5000, norm.cop)
+dat <- mvrnorm(5000, c(0, 0), matrix(c(1, .5, .5, 1), 2))
+## True kendall's tau is 2 * asin(.5) / pi
 system.time(print(kendall(dat)))
 system.time(print(cor(dat, method = "kendall")))
 }

@@ -14,10 +14,10 @@
 #' @references Kendall, M. G. (1938), A new measure of rank correlation, \emph{Biometrika}, 81--93.
 #' @seealso \code{\link{cor}}
 #' @examples
-#' library(copula)
-#' norm.cop <- normalCopula(iTau(normalCopula(), .5))
+#' library(MASS)
 #' set.seed(1)
-#' dat <- rCopula(5000, norm.cop)
+#' dat <- mvrnorm(5000, c(0, 0), matrix(c(1, .5, .5, 1), 2))
+#' ## True kendall's tau is 2 * asin(.5) / pi
 #' system.time(print(kendall(dat)))
 #' system.time(print(cor(dat, method = "kendall")))
 kendall <- function(x, y = NULL) {
