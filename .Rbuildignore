@@ -5,3 +5,4 @@
 ^README-.*\.png$
 skip-check*
 ^appveyor\.yml$
+^\.travis\.yml$
