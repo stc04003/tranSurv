@@ -17,3 +17,4 @@ LazyData: true
 RoxygenNote: 6.1.0
 Imports: survival,
     SQUAREM
+Suggests: MASS
