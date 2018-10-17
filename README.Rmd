@@ -51,3 +51,9 @@ devtools::install_github("stc04003/tranSurv")
 library(tranSurv)
 ```
 
+### Online documentation 
+[Online document](https://www.sychiou.com/tranSurv/index.html) includes:
+
+* Package vignette on fitting transformation model coming up.
+
+
