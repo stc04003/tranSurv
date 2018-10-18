@@ -6,3 +6,4 @@
 skip-check*
 ^appveyor\.yml$
 ^\.travis\.yml$
+^docs$
