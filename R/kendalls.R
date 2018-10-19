@@ -93,7 +93,7 @@ kendall <- function(x, y = NULL) {
 #'     X <- rweibull(n, 2, 4) ## failure times
 #'     U <- rweibull(n, 2, 1) ## latent truncation time
 #'     T <- (1 + a) * U - a * X ## apply transformation
-#'     C <- rlnorm(n, .8, 1) ## censoring
+#'     C <- 10 ## censoring
 #'     dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C))
 #'     return(subset(dat, trun <= obs))
 #' }
@@ -135,17 +135,17 @@ condKendall <- function(trun, obs, delta = NULL, method = "MB",
         weights <- approx(sc$time, sc$surv, method = "constant",
                           xout = c(trun, obs), yleft = 1, yright = min(sc$surv))$y
     }
-    res <- vector("double", 2)
+    ## res <- vector("double", 2)
     if (method != "IPW2") {
         tmp <- .C("condKendallC", as.double(trun), as.double(obs), as.double(delta),
                   as.integer(n), as.double(weights), as.integer(which(method == methName)), 
-                  tmp = as.double(res), PACKAGE = "tranSurv")$tmp
+                  tmp = double(2), PACKAGE = "tranSurv")$tmp
     } else {
         event <- delta == 1
         tmp <- .C("condKendallC", as.double(trun[event]), as.double(obs[event]),
                   as.double(delta[event]), as.integer(sum(event)), as.double(weights[rep(event, 2)]),
                   as.integer(which(method == methName)), 
-                  tmp = as.double(res), PACKAGE = "tranSurv")$tmp
+                  tmp = double(2), PACKAGE = "tranSurv")$tmp
     }
     out$PE <- tmp[1]
     out$SE <- ifelse(tmp[2] >= 0, sqrt(tmp[2]), NA)

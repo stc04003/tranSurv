@@ -39,41 +39,41 @@ void condKendallC(double *t1, double *t2, double *d, int *n, double *weights,
   double v = 0.0;
   double v1 = 0.0;
   double v2 = 0.0;
-  for (i = 0; i < (*n - 1); i++) {
-    for (j = i + 1; j < *n; j++) {
+  for (i = 0; i < (n[0] - 1); i++) {
+    for (j = i + 1; j < n[0]; j++) {
       if (fmax(t1[i], t1[j]) <= fmin(t2[i], t2[j]) &&
 	  d[i] * (t2[i] <= t2[j]) + d[j] * (t2[j] <= t2[i]) > 0 &&
-	  weights[i] * weights[j] * weights[i + *n] * weights[j + *n] > 0) {
+	  weights[i] * weights[j] * weights[i + n[0]] * weights[j + n[0]] > 0) {
 	tmp = (t1[i] - t1[j]) * (t2[i] - t2[j]);
 	sgn = (tmp > 0) - (tmp < 0);
-	if (*meth == 1) wgt = 1;
-	if (*meth == 2) wgt = fmax(weights[j + *n], weights[i + *n]) *
-			  fmax(weights[j + *n], weights[i + *n]) / (weights[j] * weights[i]);
-	if (*meth == 3) {
-	  wgt = weights[j + *n] * weights[i + *n] / (weights[j] * weights[i]);
+	if (meth[0] == 1) wgt = 1;
+	if (meth[0] == 2) wgt = fmax(weights[j + n[0]], weights[i + n[0]]) *
+			  fmax(weights[j + n[0]], weights[i + n[0]]) / (weights[j] * weights[i]);
+	if (meth[0] == 3) {
+	  wgt = weights[j + n[0]] * weights[i + n[0]] / (weights[j] * weights[i]);
 	  Uc += d[i] * d[j] * sgn / wgt;
 	  Um += d[i] * d[j] / wgt;
-	  bb[i * (*n - 1) + j - 1] = bb[j * (*n - 1) + i] = d[i] * d[j] * sgn / wgt;
+	  bb[i * (n[0] - 1) + j - 1] = bb[j * (n[0] - 1) + i] = d[i] * d[j] * sgn / wgt;
 	} else {
 	  Uc += sgn / wgt;
 	  Um += 1 / wgt;
-	  bb[i * (*n - 1) + j - 1] = bb[j * (*n - 1) + i] = sgn / wgt;
+	  bb[i * (n[0] - 1) + j - 1] = bb[j * (n[0] - 1) + i] = sgn / wgt;
 	}
 	wgt = 0.0;
       }
     }
   }
   out[0] = Uc / Um;
-  for (i = 0; i < *n; i++) {
-    for (j = 0; j < (*n - 1); j++) {
-      v1 += bb[i * (*n - 1) + j];
-      v2 += bb[i * (*n - 1) + j] * bb[i * (*n - 1) + j];
+  for (i = 0; i < n[0]; i++) {
+    for (j = 0; j < (n[0] - 1); j++) {
+      v1 += bb[i * (n[0] - 1) + j];
+      v2 += bb[i * (n[0] - 1) + j] * bb[i * (n[0] - 1) + j];
     }
-    v += (v1 * v1 - v2) / *n;
+    v += (v1 * v1 - v2) / n[0];
     v1 = 0.0; 
     v2 = 0.0;
   }
-  out[1] = v * *n * (*n - 1) / (Um * Um * (*n - 2));
+  out[1] = v * n[0] * (n[0] - 1) / (Um * Um * (n[0] - 2));
   Free(bb);
 }
 
