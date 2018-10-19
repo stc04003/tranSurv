@@ -1,0 +1,75 @@
+---
+title: "Fitting `trSurvfit`"
+author: "Steven Chiou"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE)
+```
+
+
+```{R session, echo = FALSE, message = FALSE}
+library(tranSurv)
+```
+
+This vignette provides a short tutorial on the usage of the package's main function, `trSurvfit`.
+
+## Illustration
+Example function in `?trSurvfit`
+```{R trEx}
+datgen <- function(n) {
+    a <- -0.3
+    X <- rweibull(n, 2, 4) ## failure times
+    U <- rweibull(n, 2, 1) ## latent truncation time
+    T <- (1 + a) * U - a * X ## apply transformation
+    C <- 10 ## censoring
+    dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C))
+    return(subset(dat, trun <= obs))
+}
+```
+Set a random seed and see data structure.
+```{R data}
+set.seed(1)
+dat <- datgen(100)
+head(dat)
+```
+The `trun` is the truncation time, `obs` is the observed survival time, and `delta` is the censoring indicator.
+Fitting this with `trSurvfit`:
+```{R data-fit}
+with(dat, trSurvfit(trun, obs, delta))
+```
+The function `trSurvfit` gives some important information. 
+The conditional Kendall's tau for the observed data (before transformation) is 0.5312 with a $p$-value < 0.001. 
+The restricted IPW Kendall's tau (Austin and Betensky, 2014) gives the same result. 
+The transformation parameter, $a$, turns out to be $-0.3011$. 
+The estimated survival curve (based on $a$) can be plotted with `survfit`:
+```{R data-survfit}
+library(survival)
+foo <- with(dat, trSurvfit(trun, obs, delta))
+plot(survfit(Surv(ta, obs, delta) ~ 1, data = foo$qind))
+```
+
+## Simulation
+Make a function to call the transformation parameter $\alpha$. 
+```{R trEx-do}
+do <- function(n){
+  foo <- with(datgen(n), trSurvfit(trun, obs, delta))
+  c(foo$byTau$par[1], foo$byP$par[1])
+}
+```
+Try $n = 100$ with 100 replicates:
+```{R trEx-run, cache = TRUE}
+set.seed(1)
+result <- replicate(100, do(100))
+```
+This returns a 2 by 100 matrix. 
+The first row gives $\hat\alpha$ by maximizing the conditional Kendall's tau and the second row gives $\hat\alpha$ by minimizing the $p$-value from the conditional Kendall's tau test.
+```{R trEx-res}
+summary(t(result))
+```
