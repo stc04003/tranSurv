@@ -76,6 +76,18 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/tranSurv-test.html">Fitting `trSurvfit`</a>
+    </li>
+  </ul>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -195,7 +207,7 @@ the two versions of the inverse probability weighted Kendall's tau of Austin and
     <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'>rweibull</span>(<span class='no'>n</span>, <span class='fl'>2</span>, <span class='fl'>4</span>) <span class='co'>## failure times</span>
     <span class='no'>U</span> <span class='kw'>&lt;-</span> <span class='fu'>rweibull</span>(<span class='no'>n</span>, <span class='fl'>2</span>, <span class='fl'>1</span>) <span class='co'>## latent truncation time</span>
     <span class='no'>T</span> <span class='kw'>&lt;-</span> (<span class='fl'>1</span> + <span class='no'>a</span>) * <span class='no'>U</span> - <span class='no'>a</span> * <span class='no'>X</span> <span class='co'>## apply transformation</span>
-    <span class='no'>C</span> <span class='kw'>&lt;-</span> <span class='fu'>rlnorm</span>(<span class='no'>n</span>, <span class='fl'>.8</span>, <span class='fl'>1</span>) <span class='co'>## censoring</span>
+    <span class='no'>C</span> <span class='kw'>&lt;-</span> <span class='fl'>10</span> <span class='co'>## censoring</span>
     <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>trun</span> <span class='kw'>=</span> <span class='no'>T</span>, <span class='kw'>obs</span> <span class='kw'>=</span> <span class='fu'>pmin</span>(<span class='no'>X</span>, <span class='no'>C</span>), <span class='kw'>delta</span> <span class='kw'>=</span> <span class='fl'>1</span> * (<span class='no'>X</span> <span class='kw'>&lt;=</span> <span class='no'>C</span>))
     <span class='fu'>return</span>(<span class='fu'>subset</span>(<span class='no'>dat</span>, <span class='no'>trun</span> <span class='kw'>&lt;=</span> <span class='no'>obs</span>))
 }
@@ -207,19 +219,19 @@ the two versions of the inverse probability weighted Kendall's tau of Austin and
 #&gt; 
 #&gt;  Call: condKendall(trun = trun, obs = obs, delta = delta)
 #&gt; 
-#&gt;  Kendall's tau = 0.5213 , SE = 0.1042 , Z = 5.0031 , p-value =  0 
+#&gt;  Kendall's tau = 0.5145 , SE = 0.0696 , Z = 7.3945 , p-value =  0 
 #&gt; </div><div class='input'><span class='fu'>with</span>(<span class='no'>dat</span>, <span class='fu'>condKendall</span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='no'>delta</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"IPW1"</span>))</div><div class='output co'>#&gt; 
 #&gt;  Test for quasi-independence with conditional Kendall's tau
 #&gt; 
 #&gt;  Call: condKendall(trun = trun, obs = obs, delta = delta, method = "IPW1")
 #&gt; 
-#&gt;  Kendall's tau = 0.5371 , SE = 0.1127 , Z = 4.7656 , p-value =  0 
+#&gt;  Kendall's tau = 0.5145 , SE = 0.0696 , Z = 7.3945 , p-value =  0 
 #&gt; </div><div class='input'><span class='fu'>with</span>(<span class='no'>dat</span>, <span class='fu'>condKendall</span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='no'>delta</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"IPW2"</span>))</div><div class='output co'>#&gt; 
 #&gt;  Test for quasi-independence with conditional Kendall's tau
 #&gt; 
 #&gt;  Call: condKendall(trun = trun, obs = obs, delta = delta, method = "IPW2")
 #&gt; 
-#&gt;  Kendall's tau = 0.5056 , SE = 0.1341 , Z = 3.7699 , p-value =  2e-04 
+#&gt;  Kendall's tau = 0.5126 , SE = 0.0695 , Z = 7.3772 , p-value =  0 
 #&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

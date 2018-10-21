@@ -7,6 +7,10 @@ output:
     toc: true
     toc_depth: 2
     toc_float: true
+vignette: >
+  %\VignetteIndexEntry{Fitting `trSurvfit`}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}{inputenc}
 ---
 
 ```{r setup, include=FALSE}
