@@ -160,10 +160,10 @@ implemented in C.</p>
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/MASS/topics/mvrnorm'>mvrnorm</a></span>(<span class='fl'>5000</span>, <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>0</span>), <span class='fu'>matrix</span>(<span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>.5</span>, <span class='fl'>.5</span>, <span class='fl'>1</span>), <span class='fl'>2</span>))
 <span class='co'>## True kendall's tau is 2 * asin(.5) / pi</span>
 <span class='fu'>system.time</span>(<span class='fu'>print</span>(<span class='fu'>kendall</span>(<span class='no'>dat</span>)))</div><div class='output co'>#&gt; [1] 0.3486412</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.016   0.000   0.019 </div><div class='input'><span class='fu'>system.time</span>(<span class='fu'>print</span>(<span class='fu'>cor</span>(<span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"kendall"</span>)))</div><div class='output co'>#&gt;           [,1]      [,2]
+#&gt;   0.020   0.000   0.019 </div><div class='input'><span class='fu'>system.time</span>(<span class='fu'>print</span>(<span class='fu'>cor</span>(<span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"kendall"</span>)))</div><div class='output co'>#&gt;           [,1]      [,2]
 #&gt; [1,] 1.0000000 0.3486412
 #&gt; [2,] 0.3486412 1.0000000</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.520   0.000   0.517 </div></pre>
+#&gt;   0.520   0.000   0.519 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

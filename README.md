@@ -33,4 +33,4 @@ library(tranSurv)
 
 [Online document](https://www.sychiou.com/tranSurv/index.html) includes:
 
--   Package vignette on [fitting transformation model](https://www.sychiou.com/reReg/articles/tranSurv-test.html)
+-   Package vignette on [fitting transformation model](https://www.sychiou.com/tranSurv/articles/tranSurv-test.html)
