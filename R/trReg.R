@@ -5,7 +5,8 @@
 #'
 #' @noRd
 #' @keywords internal
-trFit.kendall <- function(DF, engine) {
+trFit.kendall <- function(DF, engine, stdErr) {
+    out <- NULL
     trun <- DF$start
     obs <- DF$stop
     delta <- DF$status
@@ -13,8 +14,8 @@ trFit.kendall <- function(DF, engine) {
     lower <- ifelse(engine@lower == -Inf,  -.Machine$integer.max, engine@lower)
     upper <- ifelse(engine@upper == Inf, .Machine$integer.max, engine@upper)
     sc <- survfit(Surv(trun, obs, 1 - delta) ~ 1)
-    trun1 <- trun[order(obs)][delta[order(obs)] == 1]
-    obs1 <- sort(obs[delta == 1])
+    trun1 <- trun[delta == 1] ## trun[order(obs)][delta[order(obs)] == 1]
+    obs1 <- obs[delta == 1]
     delta1 <- delta[delta == 1]
     ## optimize getA in many grids
     grids <- seq(lower + 1e-5, upper, length.out = engine@G)
@@ -24,22 +25,26 @@ trFit.kendall <- function(DF, engine) {
     a <- as.numeric(tmp[1, which.min(tmp[2,])])
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
     wgtX <- approx(sc$time, sc$surv, obs1, "constant", yleft = 1, yright = min(sc$surv))$y
-    out <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ DF[delta == 1,-(1:3)], weights = 1 / wgtX)))    
+    out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]), weights = 1 / wgtX)))    
     ## trun0 <- ifelse(delta == 1, ta[match(obs, obs1)], trun)
     ## out <- coef(summary(coxph(Surv(trun0, obs, delta) ~ DF[,-(1:3)], weights = 1 / wgtX)))
-    rownames(out) <- names(DF)[-(1:3)]
+    rownames(out$PE) <- names(DF)[-(1:3)]
+    out$varNames <- names(DF)[-(1:3)]
+    out$SE <- NA
+    out$a <- a
     return(out)
 }
 
-trFit.adjust <- function(DF, engine) {
+trFit.adjust <- function(DF, engine, stdErr) {
+    out <- NULL
     trun <- DF$start
     obs <- DF$stop
     delta <- DF$status
     lower <- ifelse(engine@lower == -Inf,  -.Machine$integer.max, engine@lower)
     upper <- ifelse(engine@upper == Inf, .Machine$integer.max, engine@upper)
     sc <- survfit(Surv(trun, obs, 1 - delta) ~ 1)
-    trun1 <- trun[order(obs)][delta[order(obs)] == 1]
-    obs1 <- sort(obs[delta == 1])
+    trun1 <- trun[delta == 1]
+    obs1 <- obs[delta == 1]
     delta1 <- delta[delta == 1]
     wgtX <- approx(sc$time, sc$surv, obs1, "constant", yleft = 1, yright = min(sc$surv))$y
     coxAj <- function(a) {
@@ -48,7 +53,8 @@ trFit.adjust <- function(DF, engine) {
             cov <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
                                        include.lowest = TRUE) - 1)
         else cov <- ta
-        min(sum(coef(coxph(Surv(ta, obs1, delta1) ~ DF[delta == 1,-(1:3)] + cov, weights = 1 / wgtX))[-(1:(NCOL(DF) - 3))]^2, na.rm = TRUE), 1e4)
+        min(sum(coef(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]) + cov,
+                           weights = 1 / wgtX))[-(1:(NCOL(DF) - 3))]^2, na.rm = TRUE), 1e4)
     }
     grids <- seq(lower + 1e-5, upper, length.out = engine@G)
     tmp <- sapply(1:(engine@G - 1), function(y)
@@ -59,24 +65,54 @@ trFit.adjust <- function(DF, engine) {
         cov <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
                                    include.lowest = TRUE) - 1)
     else cov <- ta
-    out <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ DF[delta == 1,-(1:3)] + cov, weights = 1 / wgtX)))[1:(NCOL(DF) - 3),,drop = FALSE]
-    rownames(out) <- names(DF)[-(1:3)]
+    out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]) + cov,
+                              weights = 1 / wgtX)))[1:(NCOL(DF) - 3),,drop = FALSE]
+    rownames(out$PE) <- names(DF)[-(1:3)]
+    out$SE <- NA
+    out$varNames <- names(DF)[-(1:3)]
+    out$a <- a
     return(out)    
+}
+
+#' @importFrom parallel makeCluster clusterExport parSapply stopCluster
+trFit.boot <- function(DF, engine, stdErr) {
+    trun <- DF$start
+    obs <- DF$stop
+    delta <- DF$status
+    out <- trFit(DF, engine, NULL)
+    if (stdErr@parallel) {
+        cl <- makeCluster(stdErr@parCl)
+        clusterExport(cl = cl,
+                      varlist = c("DF", "engine"), envir = environment())
+        out$SE <- parSapply(cl, 1:stdErr@B, function(x) trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
+        stopCluster(cl)
+    } else out$SE <- replicate(stdErr@B, trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
+    if (nrow(out$PE) > 1) out$SE <- apply(out$SE, 1, sd)
+    else out$SE <- sd(out$SE)
+    out
 }
 
 ## Class definition
 setClass("Engine",
          representation(tol = "numeric", lower = "numeric", upper = "numeric", G = "numeric", Q = "numeric", tFun = "function"),
-         prototype(tol = 1e-2, lower = -1, upper = 50, G = 30, Q = 0),
+         prototype(tol = 1e-2, lower = -1, upper = 50, G = 50, Q = 0),
          contains= "VIRTUAL")
-setlass("kendal", contains = Engine)
-setlass("adjust", contains = Engine)
-                        
-## Method Dispatch
-setGeneric("trFit", function(DF, engine) {standardGeneric("trFit")})
+setClass("kendall", contains = "Engine")
+setClass("adjust", contains = "Engine")
 
-setMethod("trFit", signature(engine = "kendall"), trFit.kendall)
-setMethod("trFit", signature(engine = "adjust"), trFit.adjust)
+setClass("stdErr",
+         representation(B = "numeric", parallel = "logical", parCl = "numeric"),
+         prototype(B = 100, parallel = FALSE, parCl = parallel::detectCores() / 2),
+         contains = "VIRTUAL")
+setClass("bootstrap", contains = "stdErr")
+
+## Method Dispatch
+setGeneric("trFit", function(DF, engine, stdErr) {standardGeneric("trFit")})
+
+setMethod("trFit", signature(engine = "kendall", stdErr = "NULL"), trFit.kendall)
+setMethod("trFit", signature(engine = "adjust", stdErr = "NULL"), trFit.adjust)
+setMethod("trFit", signature(engine = "kendall", stdErr = "bootstrap"), trFit.boot)
+setMethod("trFit", signature(engine = "adjust", stdErr = "bootstrap"), trFit.boot)
 
 #' Fitting regression model via structural transformation model
 #'
@@ -96,22 +132,30 @@ setMethod("trFit", signature(engine = "adjust"), trFit.adjust)
 #'   \item{exp}{exponential transformation structure}
 #' }
 #' @param method a character string specifying the underlying model. See \bold{Details}.
+#' @param bootSE a logical value indicating whether to find the bootstrap standard error.
 #'
-#' @importFrom survival is.Surv coxph
+#' @importFrom survival is.Surv coxph Surv
 #' @export
 #' 
 trReg <- function(formula, data, subset, tFun = "linear",
-                  method = c("kendall", "adjust")) {
-    if (class(tFun) == "character") {
-        if (tFun == "linear") FUN <- function(X, T, a) (T + a * X) / (1 + a)
-        if (tFun == "log") FUN <- function(X, T, a) exp((log(replace(T, 0, 1)) + a * log(X)) / (1 + a))
-        if (tFun == "log2") FUN <- function(X, T, a) exp((1 + a) * log(replace(T, 0, 1)) - a * log(X))
-        if (tFun == "exp") FUN <- function(X, T, a) log((exp(T) + a * exp(X)) / (1 + a))
-    } else {
-        FUN <- match.fun(tFun)
-    }
+                  method = c("kendall", "adjust"),
+                  bootSE = FALSE, 
+                  control = list()) {
     method <- match.arg(method)
     Call <- match.call()
+    engine.control <- control[names(control) %in% names(attr(getClass(method), "slots"))]
+    engine <- do.call("new", c(list(Class = method), engine.control))
+    stdErr.control <- control[names(control) %in% names(attr(getClass("bootstrap"), "slots"))]
+    stdErr <- do.call("new", c(list(Class = "bootstrap"), stdErr.control))
+    if (!bootSE) class(stdErr)[[1]] <- "NULL"
+    if (class(tFun) == "character") {
+        if (tFun == "linear") engine@tFun <- function(X, T, a) (T + a * X) / (1 + a)
+        if (tFun == "log") engine@tFun <- function(X, T, a) exp((log(replace(T, 0, 1)) + a * log(X)) / (1 + a))
+        if (tFun == "log2") engine@tFun <- function(X, T, a) exp((1 + a) * log(replace(T, 0, 1)) - a * log(X))
+        if (tFun == "exp") engine@tFun <- function(X, T, a) log((exp(T) + a * exp(X)) / (1 + a))
+    } else {
+        engine@tFun <- match.fun(tFun)
+    }   
     if (missing(data)) {
         res <- eval(formula[[2]], parent.frame())
         cov <- model.matrix(formula, parent.frame())
@@ -124,7 +168,11 @@ trReg <- function(formula, data, subset, tFun = "linear",
     formula[[2]] <- NULL
     if (formula == ~1) DF <- as.data.frame(unclass(res))
     else DF <- as.data.frame(cbind(res, cov)) ## First 3 columns reserved to `start`, `stop`, `status`
-    DF <- DF[,-which(colnames(DF) == "(Intercept)")]
-    out <- trFit(DF, engine)
+    DF <- DF[,which(colnames(DF) != "(Intercept)")]
+    out <- trFit(DF, engine, stdErr)
+    out$Call <- Call
+    out$method <- method
+    out$.data <- DF
+    class(out) <- "trReg"
     out
 }
