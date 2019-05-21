@@ -11,14 +11,12 @@ trFit.kendall <- function(DF, engine, stdErr) {
     obs <- DF$stop
     delta <- DF$status
     ## Finding the latent truncation time
-    lower <- ifelse(engine@lower == -Inf,  -.Machine$integer.max, engine@lower)
-    upper <- ifelse(engine@upper == Inf, .Machine$integer.max, engine@upper)
     sc <- survfit(Surv(trun, obs, 1 - delta) ~ 1)
     trun1 <- trun[delta == 1] ## trun[order(obs)][delta[order(obs)] == 1]
     obs1 <- obs[delta == 1]
     delta1 <- delta[delta == 1]
     ## optimize getA in many grids
-    grids <- seq(lower + 1e-5, upper, length.out = engine@G)
+    grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
     tmp <- sapply(1:(engine@G - 1), function(y)
         optimize(f = function(x) abs(getA(x, trun1, obs1, delta1, sc = sc, FUN = engine@tFun)$PE),
                  tol = engine@tol, interval = c(grids[y], grids[y + 1])))
@@ -40,8 +38,6 @@ trFit.adjust <- function(DF, engine, stdErr) {
     trun <- DF$start
     obs <- DF$stop
     delta <- DF$status
-    lower <- ifelse(engine@lower == -Inf,  -.Machine$integer.max, engine@lower)
-    upper <- ifelse(engine@upper == Inf, .Machine$integer.max, engine@upper)
     sc <- survfit(Surv(trun, obs, 1 - delta) ~ 1)
     trun1 <- trun[delta == 1]
     obs1 <- obs[delta == 1]
@@ -56,7 +52,7 @@ trFit.adjust <- function(DF, engine, stdErr) {
         min(sum(coef(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]) + cov,
                            weights = 1 / wgtX))[-(1:(NCOL(DF) - 3))]^2, na.rm = TRUE), 1e4)
     }
-    grids <- seq(lower + 1e-5, upper, length.out = engine@G)
+    grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
     tmp <- sapply(1:(engine@G - 1), function(y)
         optimize(f = function(x) suppressWarnings(coxAj(x)), interval = c(grids[y], grids[y + 1])))
     a <- as.numeric(tmp[1, which.min(tmp[2,])])
@@ -165,14 +161,22 @@ trReg <- function(formula, data, subset, tFun = "linear",
     }   
     if (!is.Surv(res)) stop("Response must be a Surv resect")
     if (!match("start", attr(res, "dimnames")[[2]])) stop("Missing left-truncation time")
+    engine@lower <- ifelse(engine@lower == -Inf,  -.Machine$integer.max, engine@lower)
+    engine@upper <- ifelse(engine@upper == Inf, .Machine$integer.max, engine@upper)
     formula[[2]] <- NULL
-    if (formula == ~1) DF <- as.data.frame(unclass(res))
-    else DF <- as.data.frame(cbind(res, cov)) ## First 3 columns reserved to `start`, `stop`, `status`
-    DF <- DF[,which(colnames(DF) != "(Intercept)")]
-    out <- trFit(DF, engine, stdErr)
+    if (formula == ~1) {
+        DF <- as.data.frame(unclass(res))
+        out <- trSurvfit(DF$start, DF$stop, DF$status, trans = tFun, plots = FALSE,
+                         control = trSurv.control(lower = engine@lower, upper = engine@upper))
+        class(out) <- "trSurvfit"
+    } else {
+        DF <- as.data.frame(cbind(res, cov)) ## First 3 columns reserved to `start`, `stop`, `status`
+        DF <- DF[,which(colnames(DF) != "(Intercept)")]
+        out <- trFit(DF, engine, stdErr)
+        class(out) <- "trReg"
+    }
     out$Call <- Call
     out$method <- method
     out$.data <- DF
-    class(out) <- "trReg"
     out
 }
