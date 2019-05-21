@@ -35,3 +35,15 @@ print.trSurvfit <- function(x, ...) {
               round(x$byP$par, 4), "\n\n"))
 }
 
+#' @export
+print.trReg <- function(x, ...) {
+    cat("\n Call:")
+    print(x$Call)
+    cat("\n   n =", nrow(x$.data), " number of events = ", sum(x$.data$status), "\n\n")
+    tab <- cbind(Estimate = round(x$PE[,1], 3), StdErr = round(x$SE, 3),
+                 z.value = round(x$PE[,1] / x$SE, 3),
+                 p.value = round(2 * pnorm(-abs(x$PE[,1] / x$SE)), 3))
+    rownames(tab) <- x$varNames
+    printCoefmat(as.data.frame(tab), P.values = TRUE, has.Pvalue = TRUE)
+    cat("\n Transformation parameter is", x$a, "\n")
+}
