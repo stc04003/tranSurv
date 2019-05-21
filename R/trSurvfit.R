@@ -29,7 +29,7 @@
 #' }
 #' @param plots an optional logical value; if TRUE, a series of diagnostic plots as well as the survival curve for the observed failure time will be plotted.
 #' @param covariate an optional logical value; if TRUE, covariates will be included in the output data.frame \code{qind}.
-#' @param control controls lower and upper bounds when \code{trans} is an user specified function.
+#' @param control controls the lower and upper bounds when \code{trans} is an user specified function.
 #' @param ... for future methods.
 #' 
 #' @return The output contains the following components:

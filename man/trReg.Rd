@@ -5,7 +5,7 @@
 \title{Fitting regression model via structural transformation model}
 \usage{
 trReg(formula, data, subset, tFun = "linear", method = c("kendall",
-  "adjust"), bootSE = FALSE, control = list())
+  "adjust"), B = 0, control = list())
 }
 \arguments{
 \item{formula}{a formula expression, of the form \code{response ~ predictors}.
@@ -27,8 +27,42 @@ When \code{tFun} is a character, the following are permitted:
 
 \item{method}{a character string specifying the underlying model. See \bold{Details}.}
 
-\item{bootSE}{a logical value indicating whether to find the bootstrap standard error.}
+\item{B}{a numerical value specifies the bootstrap size.
+When \code{B = 0}, the bootstrap standard errors will not be computed.}
+
+\item{control}{ca list of control parameters. The following arguments are allowed:
+\describe{
+  \item{\code{lower}}{The lower bound to search for the transformation parameter; default at -1.}
+  \item{\code{upper}}{The upper bound to search for the transformation parameter; default at 20.}
+  \item{\code{tol}}{The tolerance used in the search for the transformation parameter; default at 0.01.}
+  \item{\code{G}}{The number of grids used in the search for the transformation parameter; default at 50.
+A smaller \code{G} could results in faster search, but might be inaccurate.}
+  \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}.}
+  \item{\code{parallel}}{an logical value indicating whether parallel computation will be applied when \code{B} is not 0.}
+  \item{\code{parCl}}{an integer value specifying the number of CPU cores to be used when \code{parallel = TRUE}.
+The default value is half the CPU cores on the current host.}
+}}
 }
 \description{
 \code{trReg} fits transformation model under dependent truncation and independent censoring via a structural transformation model.
+}
+\examples{
+library(survival)
+## Generate simulated data from a transformation model
+datgen <- function(n) {
+    a <- -0.3
+    X <- rweibull(n, 2, 4) ## failure times
+    U <- rweibull(n, 2, 1) ## latent truncation time
+    T <- (1 + a) * U - a * X ## apply transformation
+    C <- 10 ## censoring
+    Z <- rnorm(n) ## unrelated covariate
+    dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C), Z = Z)
+    return(subset(dat, trun <= obs))
+}
+
+set.seed(123)
+dat <- datgen(300)
+trReg(Surv(trun, obs, delta) ~ Z, data = dat)
+trReg(Surv(trun, obs, delta) ~ Z, data = dat,
+method = "adjust", control = list(G = 10))
 }
