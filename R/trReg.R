@@ -33,6 +33,8 @@ trFit.kendall <- function(DF, engine, stdErr) {
     return(out)
 }
 
+#' @noRd
+#' @keywords internal
 trFit.adjust <- function(DF, engine, stdErr) {
     out <- NULL
     trun <- DF$start
@@ -71,6 +73,8 @@ trFit.adjust <- function(DF, engine, stdErr) {
 }
 
 #' @importFrom parallel makeCluster clusterExport parSapply stopCluster
+#' @noRd
+#' @keywords internal
 trFit.boot <- function(DF, engine, stdErr) {
     trun <- DF$start
     obs <- DF$stop
@@ -88,10 +92,12 @@ trFit.boot <- function(DF, engine, stdErr) {
     out
 }
 
-## Class definition
+#' Class definition
+#' @noRd
+#' @keywords internal
 setClass("Engine",
          representation(tol = "numeric", lower = "numeric", upper = "numeric", G = "numeric", Q = "numeric", tFun = "function"),
-         prototype(tol = 1e-2, lower = -1, upper = 50, G = 50, Q = 0),
+         prototype(tol = 1e-2, lower = -1, upper = 20, G = 50, Q = 0),
          contains= "VIRTUAL")
 setClass("kendall", contains = "Engine")
 setClass("adjust", contains = "Engine")
@@ -102,7 +108,9 @@ setClass("stdErr",
          contains = "VIRTUAL")
 setClass("bootstrap", contains = "stdErr")
 
-## Method Dispatch
+#' Method Dispatch
+#' @noRd
+#' @keywords internal
 setGeneric("trFit", function(DF, engine, stdErr) {standardGeneric("trFit")})
 
 setMethod("trFit", signature(engine = "kendall", stdErr = "NULL"), trFit.kendall)
@@ -128,22 +136,56 @@ setMethod("trFit", signature(engine = "adjust", stdErr = "bootstrap"), trFit.boo
 #'   \item{exp}{exponential transformation structure}
 #' }
 #' @param method a character string specifying the underlying model. See \bold{Details}.
-#' @param bootSE a logical value indicating whether to find the bootstrap standard error.
+#' @param B a numerical value specifies the bootstrap size.
+#' When \code{B = 0}, the bootstrap standard errors will not be computed.
+#' @param control ca list of control parameters. The following arguments are allowed:
+#' \describe{
+#'   \item{\code{lower}}{The lower bound to search for the transformation parameter; default at -1.}
+#'   \item{\code{upper}}{The upper bound to search for the transformation parameter; default at 20.}
+#'   \item{\code{tol}}{The tolerance used in the search for the transformation parameter; default at 0.01.}
+#'   \item{\code{G}}{The number of grids used in the search for the transformation parameter; default at 50.
+#' A smaller \code{G} could results in faster search, but might be inaccurate.}
+#'   \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}.}
+#'   \item{\code{parallel}}{an logical value indicating whether parallel computation will be applied when \code{B} is not 0.}
+#'   \item{\code{parCl}}{an integer value specifying the number of CPU cores to be used when \code{parallel = TRUE}.
+#' The default value is half the CPU cores on the current host.}
+#' }
 #'
-#' @importFrom survival is.Surv coxph Surv
-#' @export
 #' 
+#' @importFrom survival is.Surv coxph Surv
+#' @importFrom methods getClass
+#' 
+#' @export
+#' @examples
+#' library(survival)
+#' ## Generate simulated data from a transformation model
+#' datgen <- function(n) {
+#'     a <- -0.3
+#'     X <- rweibull(n, 2, 4) ## failure times
+#'     U <- rweibull(n, 2, 1) ## latent truncation time
+#'     T <- (1 + a) * U - a * X ## apply transformation
+#'     C <- 10 ## censoring
+#'     Z <- rnorm(n) ## unrelated covariate
+#'     dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C), Z = Z)
+#'     return(subset(dat, trun <= obs))
+#' }
+#'
+#' set.seed(123)
+#' dat <- datgen(300)
+#' trReg(Surv(trun, obs, delta) ~ Z, data = dat)
+#' trReg(Surv(trun, obs, delta) ~ Z, data = dat,
+#' method = "adjust", control = list(G = 10))
 trReg <- function(formula, data, subset, tFun = "linear",
                   method = c("kendall", "adjust"),
-                  bootSE = FALSE, 
-                  control = list()) {
+                  B = 0, control = list()) {
     method <- match.arg(method)
     Call <- match.call()
     engine.control <- control[names(control) %in% names(attr(getClass(method), "slots"))]
     engine <- do.call("new", c(list(Class = method), engine.control))
     stdErr.control <- control[names(control) %in% names(attr(getClass("bootstrap"), "slots"))]
     stdErr <- do.call("new", c(list(Class = "bootstrap"), stdErr.control))
-    if (!bootSE) class(stdErr)[[1]] <- "NULL"
+    stdErr@B <- B
+    if (B == 0) class(stdErr)[[1]] <- "NULL"
     if (class(tFun) == "character") {
         if (tFun == "linear") engine@tFun <- function(X, T, a) (T + a * X) / (1 + a)
         if (tFun == "log") engine@tFun <- function(X, T, a) exp((log(replace(T, 0, 1)) + a * log(X)) / (1 + a))

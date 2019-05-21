@@ -36,6 +36,7 @@ print.trSurvfit <- function(x, ...) {
 }
 
 #' @export
+#' @importFrom stats model.matrix printCoefmat sd
 print.trReg <- function(x, ...) {
     cat("\n Call:")
     print(x$Call)

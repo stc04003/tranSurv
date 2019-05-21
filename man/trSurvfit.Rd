@@ -27,7 +27,7 @@ denote events.}
 
 \item{covariate}{an optional logical value; if TRUE, covariates will be included in the output data.frame \code{qind}.}
 
-\item{control}{controls lower and upper bounds when \code{trans} is an user specified function.}
+\item{control}{controls the lower and upper bounds when \code{trans} is an user specified function.}
 
 \item{...}{for future methods.}
 }
