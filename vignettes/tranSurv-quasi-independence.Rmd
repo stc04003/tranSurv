@@ -1,0 +1,162 @@
+---
+title: "Testing quasi-independence"
+author: "Steven Chiou"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+bibliography: ../inst/bib/tranSurv.bib
+vignette: >
+  %\VignetteIndexEntry{Testing quasi-independence}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA, prompt = TRUE)
+```
+	
+In this vignette, we demonstrate how to test quasi-independence of Failure and Truncation Times 
+with the __`tranSurv`__ package.
+
+## Loading package
+
+The __`tranSurv`__ package can be installed from CRAN with 
+```{R, eval = FALSE}
+install.packages("tranSurv")
+```
+or from GitHub with
+```{R, eval = FALSE}
+devtools::install_github("stc04003/tranSurv")
+```
+Once installed, the  __`tranSurv`__ package can be loaded with
+```{R}
+library(tranSurv)
+packageVersion("tranSurv")
+```
+
+## (Unconditional) Kendall's tau
+Suppose we have the correlated data generated from the following codes with the __`copula`__ package:
+```{R}
+library(copula)
+set.seed(1)
+rho <- iTau(normalCopula(dim = 2), .5) ## convert kendall's tau to pearson's rho
+dat <- rCopula(3000, normalCopula(rho, dim = 2)) 
+dat <- data.frame(qweibull(dat, 2, 1))
+colnames(dat) <- c("T", "X")
+head(dat)
+```
+The above codes generate random sample of points $(T, X)$ from the bivariate Weibull distribution with 
+the Kendall's tau ($\tau$) of 0.5. The pairs $(T, X)$ are stored in the rows of the data frame `dat`.
+
+The consistent estimator of $\tau$ is the U-statistics
+$$ \widehat\tau = \frac{1}{\binom{n}{2}} \sum_{i = 1}^{n - 1}\sum_{j = i + 1}^n\mbox{sgn}\{(X_i - X_j)(T_i - T_j)\},$$
+where $n$ is the sample size, and $\mbox{sgn}(u)$ is the sign of $u$, e.g., @schucany1985introduction.
+The estimator, $\widehat\tau$ can be computed with `cor`:
+```{R}
+cor(dat, method = "kendall")
+```
+The __`tranSurv`__ package has a faster implementation to compute the Kendall' tau:
+```{R, cache = TRUE}
+kendall(dat)
+microbenchmark::microbenchmark(kendall(dat), cor(dat, method = "kendall"))
+```
+
+## Conditional Kendall's tau
+Assume $X$ is (left) truncated by $T$ as in the scenario of left-truncation 
+so that samples with $X < T$ are not observed. 
+We further assume $X$ is subject to independent right-censoring time $C$, 
+and $Y = \min(X, C)$ and $\Delta = I(X \le C)$ are also observed.
+The observed data is then iid copies of $(Y, T, \Delta)|Y\ge T$.
+
+```{R}
+dat$C <- rexp(3000, .5)
+dat$Y <- pmin(dat$C, dat$X)
+dat$delta <- 1 * (dat$X <= dat$C)
+dat <- subset(dat, Y >= T)
+dim(dat)
+head(dat)
+```
+The __`tranSurv`__ package provides three implementations of conditional Kendall's tau ($\tau_c$)
+for left-truncated, right-censored data.
+These implementations are called with function `condKendall`, whose arguments are as follows:
+```{R}
+args(condKendall)
+```
+
+- `trun` left truncation time satisfying `trun <= obs`.
+- `obs` observed failure time. Must be the same length as `trun`, and might be right-censored.
+- `delta` an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for `obs`. 
+If this vector is not specified, `condKendall` assumes all observed failure times are events.
+- `method` a character string specifying the different version of conditional Kendall's tau to be computed. 
+The possible methods are: 
+    - `MB` conditional Kendall's tau proposed in @tsai1990testing and @martin2005testing
+    - `IPW1` inverse probability weighted conditional Kendall's tau proposed in @austin2014eliminating
+    - `IPW2` restricted inverse probability weighted conditional Kendall's tau proposed in @austin2014eliminating
+- `weights` an optional vector of user-specified sampling weights 
+- `a` a numeric transformation parameter. The default value is 0, indicating no transformation. See @chiou2018transformation for more details.
+- `trans` a character string specifying the transformation structure. See @chiou2018transformation for more details.
+The following are permitted:
+    - `linear` linear transformation structure
+    - `log` log-linear transformation structure
+    - `exp` exponential transformation structure
+  
+#### @martin2005testing
+
+@tsai1990testing and @martin2005testing consider the consistent estimator:
+$$\widetilde\tau_c = \frac{1}{M}\sum_{i = 1}^{n - 1}\sum_{j = i + 1}^n \mbox{sgn}\{(Y_i - Y_j)(T_i - T_j)\}I(\Lambda_{ij}),$$
+where $\Lambda_{ij} = \{\max(T_i, T_j)\le \min(Y_i, Y_j)\}\cap \{\Delta_{ij}^{(1)}=1\}$, 
+$\Delta_{ij}^{(1)} = 1$ if $\min{Y_i, Y_j}$ is not a censored event and 0 otherwise. 
+The notation $\Lambda_{ij}$ ensures $Y_i$ and $Y_j$ are orderable and comparable.
+The corresponding quasi-independence test can be called with the function `condKendall`
+```{R}
+condKendall(dat$T, dat$Y, dat$delta)
+```
+where the asymptotic variance is computed using the asymptotic U-statistic variance outlined in Section 6 of 
+@martin2005testing.
+The conditional Kendall's tau value and the corresponding $p$-value can be called individually:
+```{R}
+condKendall(dat$T, dat$Y, dat$delta)$PE
+condKendall(dat$T, dat$Y, dat$delta)$p.value
+```
+
+#### @austin2014eliminating
+
+@austin2014eliminating proposed an inverse probability weighted versions of the conditional Kendall's tau estimator.
+When `method = "IPW1"`, `condKendall` compute the conditional Kendall's tau defined as $\widehat\tau_{c2}$ 
+in Section 4 of @austin2014eliminating.
+
+```{R}
+condKendall(dat$T, dat$Y, dat$delta, method = "IPW1")
+```
+
+#### @austin2014eliminating
+
+When `method = "IPW2"`, `condKendall` compute the conditional Kendall's tau defined as $\widehat\tau_{c3}$
+in Section 4 of @austin2014eliminating.
+
+```{R}
+condKendall(dat$T, dat$Y, dat$delta, method = "IPW2")
+```
+
+## Channing House study
+We illustrate the use of `condKendall` on the Channing House data set, 
+which consists of 96 male retirees from their entry to the Channing House retirement community. 
+The data can be prepared with the following codes.
+```{R}
+data(channing, package = "boot")
+chan <- subset(channing, sex == "Male" & exit > entry)
+```
+The conditional Kendall's tau values and the associated $p$-value with the different methods are:
+```{R}
+attach(chan)
+condKendall(entry, exit, cens)
+condKendall(entry, exit, cens, method = "IPW1")
+condKendall(entry, exit, cens, method = "IPW2")
+detach(chan)
+```
+The results are similar to these reported in @austin2014eliminating.
+
+## Reference
