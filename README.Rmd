@@ -54,6 +54,7 @@ library(tranSurv)
 ### Online documentation 
 [Online document](https://www.sychiou.com/tranSurv/index.html) includes:
 
+* Package vignette on [testing quasi-independence](https://www.sychiou.com/tranSurv/articles/tranSurv-quasi-independence.html)
 * Package vignette on [fitting transformation model](https://www.sychiou.com/tranSurv/articles/tranSurv-test.html)
 
 
