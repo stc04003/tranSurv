@@ -69,15 +69,6 @@
 #' dat <- datgen(300)
 #' fit <- with(dat, trSurvfit(trun, obs, delta))
 #' fit
-#'
-#' ## Checking the transformation parameter
-#' fit$byTau$par
-#' fit$byTau$obj
-#' with(dat, condKendall(trun, obs, delta, method = "IPW2", a = fit$byTau$par[1]))$PE
-#'
-#' fit$byP$par
-#' fit$byP$obj
-#' with(dat, condKendall(trun, obs, delta, method = "IPW2", a = fit$byP$par[1]))$p.value
 trSurvfit <- function(trun, obs, delta = NULL, trans = "linear", plots = FALSE, covariate = NULL,
                         control = trSurv.control(), ...) {
     ## trun = truncation time

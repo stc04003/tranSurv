@@ -80,15 +80,6 @@ set.seed(123)
 dat <- datgen(300)
 fit <- with(dat, trSurvfit(trun, obs, delta))
 fit
-
-## Checking the transformation parameter
-fit$byTau$par
-fit$byTau$obj
-with(dat, condKendall(trun, obs, delta, method = "IPW2", a = fit$byTau$par[1]))$PE
-
-fit$byP$par
-fit$byP$obj
-with(dat, condKendall(trun, obs, delta, method = "IPW2", a = fit$byP$par[1]))$p.value
 }
 \references{
 Martin E. and Betensky R. A. (2005), Testing quasi-independence of failure and truncation times via conditional Kendall's tau,
