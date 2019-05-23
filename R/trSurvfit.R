@@ -54,21 +54,12 @@
 #'
 #' @export
 #' @examples
-#' ## Generate simulated data from a transformation model
-#' datgen <- function(n) {
-#'     a <- -0.3
-#'     X <- rweibull(n, 2, 4) ## failure times
-#'     U <- rweibull(n, 2, 1) ## latent truncation time
-#'     T <- (1 + a) * U - a * X ## apply transformation
-#'     C <- 10 ## censoring
-#'     dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C))
-#'     return(subset(dat, trun <= obs))
-#' }
-#'
-#' set.seed(123)
-#' dat <- datgen(300)
-#' fit <- with(dat, trSurvfit(trun, obs, delta))
+#' \dontrun{
+#' data(channing, package = "boot")
+#' chan <- subset(channing, sex == "Male" & entry < exit)
+#' fit <- with(chan, trSurvfit(entry, exit, cens))
 #' fit
+#' }
 trSurvfit <- function(trun, obs, delta = NULL, trans = "linear", plots = FALSE, covariate = NULL,
                         control = trSurv.control(), ...) {
     ## trun = truncation time
@@ -241,7 +232,7 @@ trSurvfit <- function(trun, obs, delta = NULL, trans = "linear", plots = FALSE, 
 #'
 #' @export
 #' @seealso \code{\link{trSurvfit}}
-trSurv.control <- function(interval = c(-1, 50), lower = min(interval), upper = max(interval)) {
+trSurv.control <- function(interval = c(-1, 20), lower = min(interval), upper = max(interval)) {
     list(lower = lower, upper = upper)
 }
 

@@ -63,9 +63,9 @@ kendall <- function(x, y = NULL) {
 #' @param method a character string specifying the different version of conditional Kendall's tau to be computed.
 #' The following are permitted:
 #' \describe{
-#'   \item{\code{MB}}{conditional Kendall's tau proposed in Martin and Betensky (2005) as \deqn{\hat{\tau_c}},}
-#'   \item{\code{IPW1}}{inverse probability weighted estimator proposed in Austin and Betensky (2014) as \deqn{\hat{\tau_{c2}}},}
-#'   \item{\code{IPW2}}{restricted inverse probability weighted estimator proposed in Austin and Betensky (2014) as \deqn{\hat{\tau_{c3}}}.}
+#'   \item{\code{MB}}{conditional Kendall's tau proposed in Martin and Betensky (2005) as \eqn{\hat{\tau_c},}}
+#'   \item{\code{IPW1}}{inverse probability weighted estimator proposed in Austin and Betensky (2014) as \eqn{\hat{\tau_{c2}},}}
+#'   \item{\code{IPW2}}{restricted inverse probability weighted estimator proposed in Austin and Betensky (2014) as \eqn{\hat{\tau_{c3}}.}}
 #' }
 #' @param weights an optional vector of sampling weights used when \code{method = IPW1} or \code{method = IPW2}.
 #' Inverse probability censored weighting (IPCW) is the default.
@@ -87,22 +87,13 @@ kendall <- function(x, y = NULL) {
 #' @references Austin, M. D. and Betensky R. A. (2014), Eliminating bias due to censoring in Kendall's tau estimators for quasi-independence of truncation and failure,
 #' \emph{Computational Statistics & Data Analysis}, \bold{73}: 16-26.
 #' @examples
-#' ## Generate simulated data from transformation model
-#' datgen <- function(n) {
-#'     a <- -0.3
-#'     X <- rweibull(n, 2, 4) ## failure times
-#'     U <- rweibull(n, 2, 1) ## latent truncation time
-#'     T <- (1 + a) * U - a * X ## apply transformation
-#'     C <- 10 ## censoring
-#'     dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C))
-#'     return(subset(dat, trun <= obs))
-#' }
-#'
-#' set.seed(123)
-#' dat <- datgen(300)
-#' with(dat, condKendall(trun, obs, delta))
-#' with(dat, condKendall(trun, obs, delta, method = "IPW1"))
-#' with(dat, condKendall(trun, obs, delta, method = "IPW2"))
+#' data(channing, package = "boot")
+#' chan <- subset(channing, sex == "Male" & entry < exit)
+#' attach(chan)
+#' condKendall(entry, exit, cens)
+#' condKendall(entry, exit, cens, method = "IPW1")
+#' condKendall(entry, exit, cens, method = "IPW2")
+#' detach(chan)
 condKendall <- function(trun, obs, delta = NULL, method = "MB",
                         weights = NULL, a = 0, trans = "linear", ...) {
     methName <- c("MB", "IPW1", "IPW2")

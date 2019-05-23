@@ -158,23 +158,11 @@ setMethod("trFit", signature(engine = "adjust", stdErr = "bootstrap"), trFit.boo
 #' @export
 #' @examples
 #' library(survival)
-#' ## Generate simulated data from a transformation model
-#' datgen <- function(n) {
-#'     a <- -0.3
-#'     X <- rweibull(n, 2, 4) ## failure times
-#'     U <- rweibull(n, 2, 1) ## latent truncation time
-#'     T <- (1 + a) * U - a * X ## apply transformation
-#'     C <- 10 ## censoring
-#'     Z <- rnorm(n) ## unrelated covariate
-#'     dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C), Z = Z)
-#'     return(subset(dat, trun <= obs))
-#' }
-#'
-#' set.seed(123)
-#' dat <- datgen(300)
-#' trReg(Surv(trun, obs, delta) ~ Z, data = dat)
-#' trReg(Surv(trun, obs, delta) ~ Z, data = dat,
-#' method = "adjust", control = list(G = 10))
+#' data(channing, package = "boot")
+#' chan <- subset(channing, entry < exit)
+#' trReg(Surv(entry, exit, cens) ~ sex, data = chan)
+#' trReg(Surv(entry, exit, cens) ~ sex, data = chan, method = "adjust", control = list(G = 10))
+#' 
 trReg <- function(formula, data, subset, tFun = "linear",
                   method = c("kendall", "adjust"),
                   B = 0, control = list()) {

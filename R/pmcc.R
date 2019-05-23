@@ -19,19 +19,9 @@
 #' @export
 #' @examples
 #' ## Generate simulated data from transformation model
-#' datgen <- function(n) {
-#'     a <- -0.3
-#'     X <- rweibull(n, 2, 4) ## failure times
-#'     U <- rweibull(n, 2, 1) ## latent truncation time
-#'     T <- (1 + a) * U - a * X ## apply transformation
-#'     C <- rlnorm(n, .8, 1) ## censoring
-#'     dat <- data.frame(trun = T, obs = pmin(X, C), delta = 1 * (X <= C))
-#'     return(subset(dat, trun <= obs))
-#' }
-#'
-#' set.seed(123)
-#' dat <- datgen(300)
-#' with(dat, pmcc(trun, obs))
+#' data(channing, package = "boot")
+#' chan <- subset(channing, sex == "Male" & entry < exit & cens == 1)
+#' with(chan, pmcc(entry, exit)) ## cannot handle right censored data
 pmcc <- function(trun, obs, a = 0, trans = "linear") {
     out <- NULL
     out$Call <- match.call()

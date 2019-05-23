@@ -4,7 +4,7 @@
 \alias{trSurv.control}
 \title{Auxiliary for Controlling trSurvfit Fitting}
 \usage{
-trSurv.control(interval = c(-1, 50), lower = min(interval),
+trSurv.control(interval = c(-1, 20), lower = min(interval),
   upper = max(interval))
 }
 \arguments{
