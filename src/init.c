@@ -18,3 +18,10 @@ static const R_CMethodDef CEntries[] = {
     {"wKendallC",    (DL_FUNC) &wKendallC,    6},
     {NULL, NULL, 0}
 };
+
+void R_init_tranSurv(DllInfo *dll)
+{
+    R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
+
