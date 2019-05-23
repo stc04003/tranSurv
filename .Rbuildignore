@@ -8,3 +8,5 @@ skip-check*
 ^\.travis\.yml$
 ^docs$
 ^vignettes$
+^CRAN-RELEASE$
+^cran-comments\.md$
