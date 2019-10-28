@@ -8,9 +8,10 @@
 #' @param delta an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for \code{obs}.
 #' If this vector is not specified, \code{condKendall} assumes no censoring and all observed failure time
 #' denote events.
-#' @param weights perturbation weights.
+#' @param weights an optional perturbation weights.
 #' 
 #' @export
+#' @example inst/examples/ex_wKendall.R
 wKendall <- function(trun, obs, delta = NULL, weights = NULL) {
     n <- length(obs)
     if (is.null(delta)) delta <- rep(1, n)

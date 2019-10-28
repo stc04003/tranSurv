@@ -15,9 +15,16 @@ wKendall(trun, obs, delta = NULL, weights = NULL)
 If this vector is not specified, \code{condKendall} assumes no censoring and all observed failure time
 denote events.}
 
-\item{weights}{perturbation weights.}
+\item{weights}{an optional perturbation weights.}
 }
 \description{
 This is a temporary function, could be merged into the main function \code{condKendall}.
 Give conditional Kendall's tau with the ability to take on perturbation weights.
+}
+\examples{
+data(channing, package = "boot")
+chan <- subset(channing, sex == "Male" & entry < exit)
+## When weights is not specified, this function reduces to condKendall()
+with(chan, wKendall(entry, exit, cens))
+mean(replicate(1000, with(chan, wKendall(entry, exit, cens, rexp(nrow(chan))))))
 }

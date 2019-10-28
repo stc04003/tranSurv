@@ -37,7 +37,7 @@ When \code{B = 0}, the bootstrap standard errors will not be computed.}
   \item{\code{tol}}{The tolerance used in the search for the transformation parameter; default at 0.01.}
   \item{\code{G}}{The number of grids used in the search for the transformation parameter; default at 50.
 A smaller \code{G} could results in faster search, but might be inaccurate.}
-  \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}.}
+  \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}. The default is 0.}
   \item{\code{parallel}}{an logical value indicating whether parallel computation will be applied when \code{B} is not 0.}
   \item{\code{parCl}}{an integer value specifying the number of CPU cores to be used when \code{parallel = TRUE}.
 The default value is half the CPU cores on the current host.}

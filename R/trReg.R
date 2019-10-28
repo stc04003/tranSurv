@@ -122,8 +122,25 @@ setMethod("trFit", signature(engine = "adjust", stdErr = "bootstrap"), trFit.boo
 #'
 #' \code{trReg} fits transformation model under dependent truncation and independent censoring via a structural transformation model.
 #'
+#' The main assumption on the structural transformation model is that it assumes there is a latent, quasi-independent truncation time
+#' that is associated with the observed dependent truncation time, the event time, and an unknown dependence parameter
+#' through a specified funciton.
+#' The structure of the transformation model is of the form:
+#' \deqn{h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),} where \eqn{T} is the truncation time, \eqn{X} is the observed failure time,
+#' \eqn{U} is the transformed truncation time that is quasi-independent from \eqn{X} and \eqn{h(\cdot)} is a monotonic transformation function.
+#' The condition, \eqn{T < X}, is assumed to be satisfied.
+#' The quasi-independent truncation time, \eqn{U}, is obtained by inverting the test for quasi-independence by one of the following methods:
+#' \describe{
+#'   \item{\code{method = "kendall"}}{ by minimizing the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \eqn{p}-value.
+#' This is the same procedure used in the \code{trSUrvfit()} function.}
+#'   \item{\code{method = "adjust"}}{ includes a function of latent truncation time, \eqn{U}, as a covariate.
+#'   A piece-wise function is constructed based on \code{Q+1} indicator functions on whether \eqn{U} falls in the \eqn{Q}th and the \eqn{Q+1}th percentile,
+#'   where \eqn{Q} is the number of cutpoints used. See \code{control} for details. 
+#'   The transformation parameter, \eqn{a}, is then chosen to minimize the significance of the coefficient parameter.}} 
+#' 
 #' @param formula a formula expression, of the form \code{response ~ predictors}.
 #' The \code{response} is assumed to be a \code{survival::Surv} object with both left truncation and right censoring.
+#' When there is no covariates, e.g., when the right hand side of the formula is \code{~ 1}, the \code{trReg()} function returns a \code{trSurvfit} object.
 #' See \code{?survival::Surv} for more details.
 #' @param data  an optional data.frame in which to interpret the variables occurring
 #'     in the \code{formula}.
@@ -131,29 +148,30 @@ setMethod("trFit", signature(engine = "adjust", stdErr = "bootstrap"), trFit.boo
 #' @param tFun a character string specifying the transformation function or a user specified function indicating the relationship between X, T, and a.
 #' When \code{tFun} is a character, the following are permitted:
 #' \describe{
-#'   \item{linear}{linear transformation structure}
-#'   \item{log}{log-linear transformation structure}
-#'   \item{exp}{exponential transformation structure}
+#'   \item{linear}{linear transformation structure,}
+#'   \item{log}{log-linear transformation structure,}
+#'   \item{exp}{exponential transformation structure.}
 #' }
-#' @param method a character string specifying the underlying model. See \bold{Details}.
-#' @param B a numerical value specifies the bootstrap size.
-#' When \code{B = 0}, the bootstrap standard errors will not be computed.
-#' @param control ca list of control parameters. The following arguments are allowed:
+#' @param method a character string specifying how the transformation parameter is estimated. The available options are \code{"kendall"} and \code{"adjust"}. See \bold{Details}.
+#' @param B a numerical value specifies the bootstrap size for estimating the standard error.
+#' When \code{B = 0} (default), the bootstrap standard errors will not be computed.
+#' @param control a list of control parameters. The following arguments are allowed:
 #' \describe{
 #'   \item{\code{lower}}{The lower bound to search for the transformation parameter; default at -1.}
 #'   \item{\code{upper}}{The upper bound to search for the transformation parameter; default at 20.}
 #'   \item{\code{tol}}{The tolerance used in the search for the transformation parameter; default at 0.01.}
-#'   \item{\code{G}}{The number of grids used in the search for the transformation parameter; default at 50.
+#'   \item{\code{G}}{The number of grids used in the search for the transformation parameter; default is 50.
 #' A smaller \code{G} could results in faster search, but might be inaccurate.}
-#'   \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}.}
+#'   \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}. The default is 0.}
 #'   \item{\code{parallel}}{an logical value indicating whether parallel computation will be applied when \code{B} is not 0.}
 #'   \item{\code{parCl}}{an integer value specifying the number of CPU cores to be used when \code{parallel = TRUE}.
 #' The default value is half the CPU cores on the current host.}
 #' }
 #'
 #' 
-#' @importFrom survival is.Surv coxph Surv
+#' @importFrom survival is.Surv coxph
 #' @importFrom methods getClass
+#' @seealso \code{\link{trSurvfit}}
 #' 
 #' @export
 #' @example inst/examples/ex_trReg.R
@@ -175,32 +193,35 @@ trReg <- function(formula, data, subset, tFun = "linear",
         if (tFun == "exp") engine@tFun <- function(X, T, a) log((exp(T) + a * exp(X)) / (1 + a))
     } else {
         engine@tFun <- match.fun(tFun)
-    }   
+    }
+    vNames <- attr(terms(formula), "term.labels")
     if (missing(data)) {
-        res <- eval(formula[[2]], parent.frame())
-        cov <- model.matrix(formula, parent.frame())
+        resp <- eval(formula[[2]], parent.frame())
+        covM <- model.matrix(formula, parent.frame())
     } else {
-        res <- eval(formula[[2]], data)
-        cov <- model.matrix(formula, data)
+        resp <- eval(formula[[2]], data)
+        covM <- model.matrix(formula, data)
     }   
-    if (!is.Surv(res)) stop("Response must be a Surv resect")
-    if (!match("start", attr(res, "dimnames")[[2]])) stop("Missing left-truncation time")
+    if (!is.Surv(resp)) stop("Response must be a Surv resect")
+    if (!match("start", attr(resp, "dimnames")[[2]])) stop("Missing left-truncation time")
     engine@lower <- ifelse(engine@lower == -Inf,  -.Machine$integer.max, engine@lower)
     engine@upper <- ifelse(engine@upper == Inf, .Machine$integer.max, engine@upper)
     formula[[2]] <- NULL
     if (formula == ~1) {
-        DF <- as.data.frame(unclass(res))
+        DF <- as.data.frame(unclass(resp))
         out <- trSurvfit(DF$start, DF$stop, DF$status, trans = tFun, plots = FALSE,
                          control = trSurv.control(lower = engine@lower, upper = engine@upper))
         class(out) <- "trSurvfit"
     } else {
-        DF <- as.data.frame(cbind(res, cov)) ## First 3 columns reserved to `start`, `stop`, `status`
+        DF <- as.data.frame(cbind(resp, covM)) ## First 3 columns reserved to `start`, `stop`, `status`
         DF <- DF[,which(colnames(DF) != "(Intercept)")]
         out <- trFit(DF, engine, stdErr)
         class(out) <- "trReg"
     }
     out$Call <- Call
+    out$B <- B
+    out$vNames <- vNames
     out$method <- method
-    out$.data <- DF
+    out$.data <- DF 
     out
 }
