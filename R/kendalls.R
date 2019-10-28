@@ -13,13 +13,7 @@
 #' @export
 #' @references Kendall, M. G. (1938), A new measure of rank correlation, \emph{Biometrika}, 81--93.
 #' @seealso \code{\link{cor}}
-#' @examples
-#' library(MASS)
-#' set.seed(1)
-#' dat <- mvrnorm(5000, c(0, 0), matrix(c(1, .5, .5, 1), 2))
-#' ## True kendall's tau is 2 * asin(.5) / pi
-#' system.time(print(kendall(dat)))
-#' system.time(print(cor(dat, method = "kendall")))
+#' @example inst/examples/ex_kendalls.R
 kendall <- function(x, y = NULL) {
     if (is.null(y)) {
         if (NCOL(x) != 2L) stop("Two variables are required.")
@@ -86,14 +80,7 @@ kendall <- function(x, y = NULL) {
 #' \emph{Journal of the American Statistical Association}, \bold{100} (470): 484-492.
 #' @references Austin, M. D. and Betensky R. A. (2014), Eliminating bias due to censoring in Kendall's tau estimators for quasi-independence of truncation and failure,
 #' \emph{Computational Statistics & Data Analysis}, \bold{73}: 16-26.
-#' @examples
-#' data(channing, package = "boot")
-#' chan <- subset(channing, sex == "Male" & entry < exit)
-#' attach(chan)
-#' condKendall(entry, exit, cens)
-#' condKendall(entry, exit, cens, method = "IPW1")
-#' condKendall(entry, exit, cens, method = "IPW2")
-#' detach(chan)
+#' @example inst/examples/ex_condKendall.R
 condKendall <- function(trun, obs, delta = NULL, method = "MB",
                         weights = NULL, a = 0, trans = "linear", ...) {
     methName <- c("MB", "IPW1", "IPW2")

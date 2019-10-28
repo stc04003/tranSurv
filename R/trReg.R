@@ -156,13 +156,7 @@ setMethod("trFit", signature(engine = "adjust", stdErr = "bootstrap"), trFit.boo
 #' @importFrom methods getClass
 #' 
 #' @export
-#' @examples
-#' library(survival)
-#' data(channing, package = "boot")
-#' chan <- subset(channing, entry < exit)
-#' trReg(Surv(entry, exit, cens) ~ sex, data = chan)
-#' trReg(Surv(entry, exit, cens) ~ sex, data = chan, method = "adjust", control = list(G = 10))
-#' 
+#' @example inst/examples/ex_trReg.R
 trReg <- function(formula, data, subset, tFun = "linear",
                   method = c("kendall", "adjust"),
                   B = 0, control = list()) {

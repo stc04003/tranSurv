@@ -47,7 +47,6 @@ The default value is half the CPU cores on the current host.}
 \code{trReg} fits transformation model under dependent truncation and independent censoring via a structural transformation model.
 }
 \examples{
-library(survival)
 data(channing, package = "boot")
 chan <- subset(channing, entry < exit)
 trReg(Surv(entry, exit, cens) ~ sex, data = chan)
