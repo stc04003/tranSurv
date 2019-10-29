@@ -15,7 +15,7 @@ kendall(x, y = NULL)
 The output is a numeric value for the unconditional Kendall's tau.
 }
 \description{
-Computes the Unconditional Kendall's Tau
+Computes the unconditional Kendall's tau
 }
 \details{
 This function computes the unconditional Kendall's tau (the Kendall rank correlation coefficient) for two variables.

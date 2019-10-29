@@ -1,93 +1,96 @@
 #' Estimating survival curves via structural transformation model
 #'
 #' \code{trSurvfit} estimates survival curves under dependent truncation and independent censoring via a structural transformation model.
-#' A structural transformation model for a latent, quasi-independent truncation time as a function of the observed dependent truncation time and the event time, and an unknown dependence parameter.
-#' The dependence parameter is chosen to either minimize the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding p-value.
+#'
+#' A structural transformation model assumes there is a latent, quasi-independent truncation time
+#' that is associated with the observed dependent truncation time, the event time, and an unknown dependence parameter
+#' through a specified funciton.
+#' The dependence parameter is chosen to either minimize the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \eqn{p}-value.
 #' The marginal distribution for the truncation time and the event time are completely left unspecified.
 #'
 #' The structure of the transformation model is of the form:
-#' \deqn{h(U) = (1 + a)^-1 * (h(T) + ah(X)),} where T is the truncation time, X is the observed failure time,
-#' U is the transformed truncation time that is quasi-independent from X and h(.) is a monotonic transformation function.
-#' The condition, T < X, is assumed to be satisfied.
-#' The quasi-independent truncation time, U, is obtained by inverting the test for quasi-independence by either minimizing
-#' the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding p-value.
+#' \deqn{h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),} where \eqn{T} is the truncation time, \eqn{X} is the observed failure time,
+#' \eqn{U} is the transformed truncation time that is quasi-independent from \eqn{X} and \eqn{h(\cdot)} is a monotonic transformation function.
+#' The condition, \eqn{T < X}, is assumed to be satisfied.
+#' The quasi-independent truncation time, \eqn{U}, is obtained by inverting the test for quasi-independence by either minimizing
+#' the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \eqn{p}-value.
 #'
-#' At the current version, three transformation structures can be specified. \code{trans = "linear"} corresponds to \deqn{h(X) = 1};
-#' \code{trans = "log"} corresponds to \deqn{h(X) = log(X)};
-#' \code{trans = "exp"} corresponds to \deqn{h(X) = exp(X)}.
+#' At the current version, three transformation structures can be specified. \code{trans = "linear"} corresponds to \deqn{h(X) = 1;}
+#' \code{trans = "log"} corresponds to \deqn{h(X) = log(X);}
+#' \code{trans = "exp"} corresponds to \deqn{h(X) = exp(X).}
 #' 
 #' @param trun left truncation time satisfying \code{trun} <= \code{obs}.
 #' @param obs observed failure time, must be the same length as \code{trun}, might be right-censored.
 #' @param delta an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for \code{obs}.
-#' If this vector is not specified, \code{condKendall} assumes no censoring and all observed failure time
+#' If this vector is not specified, \code{cKendall} assumes no censoring and all observed failure time
 #' denote events.
-#' @param trans a character string specifying the transformation structure. The following are permitted:
+#' @param tFun a character string specifying the transformation function or a user specified function indicating the relationship
+#' between \eqn{X}, \eqn{T}, and \eqn{a}.
+#' When \code{tFun} is a character, the following are permitted:
 #' \describe{
-#'   \item{linear}{linear transformation structure,}
-#'   \item{log}{log-linear transformation structure,}
+#'   \item{linear}{linear transformation structure;}
+#'   \item{log}{log-linear transformation structure;}
 #'   \item{exp}{exponential transformation structure.}
 #' }
 #' @param plots an optional logical value; if TRUE, a series of diagnostic plots as well as the survival curve for the observed failure time will be plotted.
-#' @param covariate an optional logical value; if TRUE, covariates will be included in the output data.frame \code{qind}.
 #' @param control controls the lower and upper bounds when \code{trans} is an user specified function.
 #' @param ... for future methods.
 #' 
 #' @return The output contains the following components:
 #' \describe{
-#'   \item{Sy}{estimated survival function at the (ordered) observed points.}
-#'   \item{byTau}{a list contains the estimator of transformation parameter:
-#'     \code{par} is the best set of transformation parameter found;
-#'     \code{obj} is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.} 
-#'   \item{byP}{a list contains the estimator of transformation parameter:
-#'     \code{par} is the best set of transformation parameter found;
-#'     \code{obj} is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}
-#'   \item{qind}{a data frame consists of two quasi-independent variables:
-#'     \code{trun} is the transformed truncation time; 
-#'     \code{obs} is the corresponding uncensored failure time.}
+#'   \item{\code{surv}}{is a \code{data.frame} contains the survival probabilities estimates.}
+#'   \item{\code{byTau}}{a list contains the estimator of transformation parameter:
+#'     \describe{
+#'     \item{\code{par}}{is the best set of transformation parameter found;}
+#'     \item{\code{obj}}{is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}}
+#'   }
+#'   \item{\code{byP}}{a list contains the estimator of transformation parameter:
+#'     \describe{
+#'     \item{\code{par}}{is the best set of transformation parameter found;}
+#'     \item{\code{obj}}{is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}}
+#'   }
+#'   \item{\code{qind}}{a data frame consists of two quasi-independent variables:
+#'     \describe{
+#'     \item{\code{trun}}{ is the transformed truncation time;}
+#'     \item{\code{obs}}{ is the corresponding uncensored failure time.}}}
 #' }
 #'
 #' @references Martin E. and Betensky R. A. (2005), Testing quasi-independence of failure and truncation times via conditional Kendall's tau,
 #' \emph{Journal of the American Statistical Association}, \bold{100} (470): 484-492.
 #' @references Austin, M. D. and Betensky R. A. (2014), Eliminating bias due to censoring in Kendall's tau estimators for quasi-independence of truncation and failure,
 #' \emph{Computational Statistics & Data Analysis}, \bold{73}: 16-26.
-#' @references Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2016), Transformation model estimation of survival under dependent truncation and independent censoring, an unpublished manuscript.
+#' @references Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2018), Transformation model estimation of survival under dependent truncation and independent censoring,
+#' \emph{Statistical Methods in Medical Research}, \bold{28} (12): 3785-3798.
 #'
 #' @export
-#' @examples
-#' \dontrun{
-#' data(channing, package = "boot")
-#' chan <- subset(channing, sex == "Male" & entry < exit)
-#' fit <- with(chan, trSurvfit(entry, exit, cens))
-#' fit
-#' }
-trSurvfit <- function(trun, obs, delta = NULL, trans = "linear", plots = FALSE, covariate = NULL,
+#' @example inst/examples/ex_trSurvfit.R
+trSurvfit <- function(trun, obs, delta = NULL, tFun = "linear", plots = FALSE, 
                         control = trSurv.control(), ...) {
     ## trun = truncation time
     ## obs = observed failure time
     ## delta = censoring indicator
     out <- NULL
     if (is.null(delta)) delta <- rep(1, length(trun))
-    if (class(trans) == "character") {
-        if (trans == "linear") FUN <- function(X, T, a) (T + a * X) / (1 + a)
-        if (trans == "log") FUN <- function(X, T, a) exp((log(replace(T, 0, 1)) + a * log(X)) / (1 + a))
-        if (trans == "log2") FUN <- function(X, T, a) exp((1 + a) * log(replace(T, 0, 1)) - a * log(X))
-        if (trans == "exp") FUN <- function(X, T, a) log((exp(T) + a * exp(X)) / (1 + a))
+    if (class(tFun) == "character") {
+        if (tFun == "linear") FUN <- function(X, T, a) (T + a * X) / (1 + a)
+        if (tFun == "log") FUN <- function(X, T, a) exp((log(replace(T, 0, 1)) + a * log(X)) / (1 + a))
+        if (tFun == "log2") FUN <- function(X, T, a) exp((1 + a) * log(replace(T, 0, 1)) - a * log(X))
+        if (tFun == "exp") FUN <- function(X, T, a) log((exp(T) + a * exp(X)) / (1 + a))
     } else {
-        FUN <- match.fun(trans)
+        FUN <- match.fun(tFun)
     }
     lower <- ifelse(control$lower == -Inf, -.Machine$integer.max, control$lower)
     upper <- ifelse(control$upper == Inf, .Machine$integer.max, control$upper)
-    ini <- condKendall(trun, obs, delta)
-    ini.ipw <- condKendall(trun, obs, delta, method = "IPW2")    
+    ini <- cKendall(trun, obs, delta)
+    ini.ipw <- cKendall(trun, obs, delta, method = "IPW2")    
     sc <- survfit(Surv(trun, obs, 1 - delta) ~ 1)
-    if (plots) S0 <- survfit(Surv(trun, obs, delta) ~ 1) 
+    S0 <- survfit(Surv(trun, obs, delta) ~ 1) 
     if (length(table(delta)) > 1 & 
         sum(head(sc$n.event[sc$n.event > 0]/sc$n.risk[sc$n.event > 0]) == 1) <= 2) {
         sc$time <- sc$time[sc$n.event > 0]
         sc$surv <- exp(-cumsum(sc$n.event[sc$n.event > 0]/sc$n.risk[sc$n.event > 0]))
     }
-    if (is.null(covariate)) out$qind <- subset(data.frame(trun = trun, obs = obs, delta = delta), delta == 1)
-    else out$qind <- subset(data.frame(trun = trun, obs = obs, delta = delta, Z = covariate), delta == 1)
+    out$qind <- subset(data.frame(trun = trun, obs = obs, delta = delta), delta == 1)
     out$qind <- out$qind[order(out$qind$obs),]
     y0 <- sort(obs)
     trun1 <- trun[order(obs)][delta[order(obs)] == 1]
@@ -136,7 +139,7 @@ trSurvfit <- function(trun, obs, delta = NULL, trans = "linear", plots = FALSE, 
     f1 <- tb$par / scX
     f1 <- f1 / sum(f1)
     Sy <- approx(yi, 1 - cumsum(f1), method = "constant", xout = y0, yleft = 1,
-                   yright = min(1 - cumsum(f1)))$y
+                 yright = min(1 - cumsum(f1)))$y
     ## Weighted KM
     ## s0 <- survfit(Surv(ta, yi, rep(1, length(yi))) ~ 1, weights = 1/scX)
     ## if (sum(s0$n.risk == 1) > 0) {
@@ -208,7 +211,8 @@ trSurvfit <- function(trun, obs, delta = NULL, trans = "linear", plots = FALSE, 
         legend("topright", c("Transformation", "Kaplan-Meier"), lty = 1:2, bty = "n")
         par(op2)
     }
-    out$Sy <- Sy
+    out$surv <- data.frame(Time = y0, trSurv = Sy,
+                           kmSurv = approx(S0$time, S0$surv, method = "constant", xout = y0, yleft = 1, yright = min(S0$surv))$y)
     out$byTau <- byTau
     out$byP <- byP
     ## out <- list(Sy = Sy, byTau = byTau, byP = byP,
@@ -218,6 +222,8 @@ trSurvfit <- function(trun, obs, delta = NULL, trans = "linear", plots = FALSE, 
     out$iniKendall.ipw <- ini.ipw$PE
     out$iniP <- ini$p.value
     out$iniP.ipw <- ini.ipw$p.value
+    out$tFun <- FUN
+    out$.data <- data.frame(start = trun, stop = obs, status = delta)
     class(out) <- "trSurvfit"
     out
 }
@@ -241,12 +247,12 @@ getA <- function(a, trun, obs, delta = NULL, sc = NULL, FUN, test = "CK") {
     FUN <- match.fun(FUN)
     ta <- mapply(FUN, X = obs, T = trun, a = a)
     if (is.null(sc)) {
-        if (test == "CK") tmp <- condKendall(ta, obs, delta)
+        if (test == "CK") tmp <- cKendall(ta, obs, delta)
         if (test == "PC") tmp <- pmcc(ta[delta == 1], obs[delta == 1])
      } else {
         weights <- approx(sc$time, sc$surv, method = "constant", xout = c(ta, obs),
                           yleft = 1, yright = min(sc$surv))$y
-        tmp <- condKendall(ta, obs, delta, method = "IPW2", weights = weights)
+        tmp <- cKendall(ta, obs, delta, method = "IPW2", weights = weights)
     }
     return(list(PE = tmp$PE, p.value = tmp$p.value))
 }

@@ -17,7 +17,8 @@ Martin E. and Betensky R. A. (2005), Testing quasi-independence of failure and t
 Austin, M. D. and Betensky R. A. (2014), Eliminating bias due to censoring in Kendall's tau estimators for quasi-independence of truncation and failure,
 \emph{Computational Statistics & Data Analysis}, \bold{73}: 16-26.
 
-Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2016), Transformation model estimation of survival under dependent truncation and independent censoring, an unpublished manuscript.
+Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2016), Transformation model estimation of survival under dependent truncation and independent censoring,
+\emph{Statistical Methods in Medical Research}, \bold{28} (12): 3785-3798.
 }
 \seealso{
 Useful links:

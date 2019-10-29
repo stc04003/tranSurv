@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tranSurv</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -84,7 +84,7 @@
 </h1>
                         <h4 class="author">Steven Chiou</h4>
             
-            <h4 class="date">2019-05-22</h4>
+            <h4 class="date">2019-10-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stc04003/tranSurv/blob/master/vignettes/tranSurv-test.Rmd"><code>vignettes/tranSurv-test.Rmd</code></a></small>
       <div class="hidden name"><code>tranSurv-test.Rmd</code></div>
@@ -98,19 +98,19 @@
 <h2 class="hasAnchor">
 <a href="#illustration" class="anchor"></a>Illustration</h2>
 <p>Example function in <code><a href="../reference/trSurvfit.html">?trSurvfit</a></code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>datgen &lt;-<span class="st"> </span>function(n) {
-+<span class="st">     </span>a &lt;-<span class="st"> </span>-<span class="fl">0.3</span>
-+<span class="st">     </span>X &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Weibull">rweibull</a></span>(n, <span class="dv">2</span>, <span class="dv">4</span>) ## failure times
-+<span class="st">     </span>U &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Weibull">rweibull</a></span>(n, <span class="dv">2</span>, <span class="dv">1</span>) ## latent truncation time
-+<span class="st">     </span>T &lt;-<span class="st"> </span>(<span class="dv">1</span> +<span class="st"> </span>a) *<span class="st"> </span>U -<span class="st"> </span>a *<span class="st"> </span>X ## apply transformation
-+<span class="st">     </span>C &lt;-<span class="st"> </span><span class="dv">10</span> ## censoring
-+<span class="st">     </span>dat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">trun =</span> T, <span class="dt">obs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">pmin</a></span>(X, C), <span class="dt">delta =</span> <span class="dv">1</span> *<span class="st"> </span>(X &lt;=<span class="st"> </span>C))
-+<span class="st">     </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/subset">subset</a></span>(dat, trun &lt;=<span class="st"> </span>obs))
-+<span class="st"> </span>}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>datgen &lt;-<span class="st"> </span><span class="cf">function</span>(n) {
+<span class="op">+</span><span class="st">     </span>a &lt;-<span class="st"> </span><span class="fl">-0.3</span>
+<span class="op">+</span><span class="st">     </span>X &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Weibull">rweibull</a></span>(n, <span class="dv">2</span>, <span class="dv">4</span>) ## failure times
+<span class="op">+</span><span class="st">     </span>U &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Weibull">rweibull</a></span>(n, <span class="dv">2</span>, <span class="dv">1</span>) ## latent truncation time
+<span class="op">+</span><span class="st">     </span>T &lt;-<span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>a) <span class="op">*</span><span class="st"> </span>U <span class="op">-</span><span class="st"> </span>a <span class="op">*</span><span class="st"> </span>X ## apply transformation
+<span class="op">+</span><span class="st">     </span>C &lt;-<span class="st"> </span><span class="dv">10</span> ## censoring
+<span class="op">+</span><span class="st">     </span>dat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">trun =</span> T, <span class="dt">obs =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">pmin</a></span>(X, C), <span class="dt">delta =</span> <span class="dv">1</span> <span class="op">*</span><span class="st"> </span>(X <span class="op">&lt;=</span><span class="st"> </span>C))
+<span class="op">+</span><span class="st">     </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/subset">subset</a></span>(dat, trun <span class="op">&lt;=</span><span class="st"> </span>obs))
+<span class="op">+</span><span class="st"> </span>}</code></pre></div>
 <p>Set a random seed and see data structure.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">1</span>)
-&gt;<span class="st"> </span>dat &lt;-<span class="st"> </span><span class="kw">datgen</span>(<span class="dv">100</span>)
-&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(dat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">1</span>)
+<span class="op">&gt;</span><span class="st"> </span>dat &lt;-<span class="st"> </span><span class="kw">datgen</span>(<span class="dv">100</span>)
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(dat)</code></pre></div>
 <pre><code>       trun      obs delta
 1 1.8374416 4.606270     1
 2 1.9072099 3.976991     1
@@ -119,7 +119,7 @@
 5 1.9913542 5.061325     1
 6 1.2630309 1.309359     1</code></pre>
 <p>The <code>trun</code> is the truncation time, <code>obs</code> is the observed survival time, and <code>delta</code> is the censoring indicator. Fitting this with <code>trSurvfit</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(dat, <span class="kw"><a href="../reference/trSurvfit.html">trSurvfit</a></span>(trun, obs, delta))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(dat, <span class="kw"><a href="../reference/trSurvfit.html">trSurvfit</a></span>(trun, obs, delta))</code></pre></div>
 <pre><code>
  Fitting structural transformation model 
 
@@ -130,35 +130,36 @@
  Transformation parameter by minimizing absolute value of Kendall's tau: -0.3011
  Transformation parameter by maximizing p-value of the test: -0.3011 </code></pre>
 <p>The function <code>trSurvfit</code> gives some important information. The conditional Kendall’s tau for the observed data (before transformation) is 0.5312 with a <span class="math inline">\(p\)</span>-value &lt; 0.001. The restricted IPW Kendall’s tau (Austin and Betensky, 2014) gives the same result. The transformation parameter, <span class="math inline">\(a\)</span>, turns out to be <span class="math inline">\(-0.3011\)</span>. The estimated survival curve (based on <span class="math inline">\(a\)</span>) can be plotted with <code>survfit</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(survival)
-&gt;<span class="st"> </span>foo &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(dat, <span class="kw"><a href="../reference/trSurvfit.html">trSurvfit</a></span>(trun, obs, delta))
-&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw">survfit</span>(<span class="kw">Surv</span>(ta, obs, delta) ~<span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> foo$qind))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(survival)
+<span class="op">&gt;</span><span class="st"> </span>foo &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(dat, <span class="kw"><a href="../reference/trSurvfit.html">trSurvfit</a></span>(trun, obs, delta))
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw">survfit</span>(<span class="kw"><a href="../reference/Surv.html">Surv</a></span>(ta, obs, delta) <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> foo<span class="op">$</span>qind))</code></pre></div>
 <p><img src="tranSurv-test_files/figure-html/data-survfit-1.png" width="700"></p>
 </div>
 <div id="simulation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#simulation" class="anchor"></a>Simulation</h2>
 <p>Make a function to call the transformation parameter <span class="math inline">\(\alpha\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>do &lt;-<span class="st"> </span>function(n){
-+<span class="st">   </span>foo &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(<span class="kw">datgen</span>(n), <span class="kw"><a href="../reference/trSurvfit.html">trSurvfit</a></span>(trun, obs, delta))
-+<span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(foo$byTau$par[<span class="dv">1</span>], foo$byP$par[<span class="dv">1</span>])
-+<span class="st"> </span>}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>do &lt;-<span class="st"> </span><span class="cf">function</span>(n){
+<span class="op">+</span><span class="st">   </span>foo &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(<span class="kw">datgen</span>(n), <span class="kw"><a href="../reference/trSurvfit.html">trSurvfit</a></span>(trun, obs, delta))
+<span class="op">+</span><span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(foo<span class="op">$</span>byTau<span class="op">$</span>par[<span class="dv">1</span>], foo<span class="op">$</span>byP<span class="op">$</span>par[<span class="dv">1</span>])
+<span class="op">+</span><span class="st"> </span>}</code></pre></div>
 <p>Try <span class="math inline">\(n = 100\)</span> with 100 replicates:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">1</span>)
-&gt;<span class="st"> </span>result &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">replicate</a></span>(<span class="dv">100</span>, <span class="kw">do</span>(<span class="dv">100</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">1</span>)
+<span class="op">&gt;</span><span class="st"> </span>result &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lapply">replicate</a></span>(<span class="dv">100</span>, <span class="kw">do</span>(<span class="dv">100</span>))</code></pre></div>
 <p>This returns a 2 by 100 matrix. The first row gives <span class="math inline">\(\hat\alpha\)</span> by maximizing the conditional Kendall’s tau and the second row gives <span class="math inline">\(\hat\alpha\)</span> by minimizing the <span class="math inline">\(p\)</span>-value from the conditional Kendall’s tau test.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(result))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(result))</code></pre></div>
 <pre><code>       V1                V2         
- Min.   :-0.3504   Min.   :-0.3504  
- 1st Qu.:-0.3175   1st Qu.:-0.3174  
+ Min.   :-0.3505   Min.   :-0.3502  
+ 1st Qu.:-0.3175   1st Qu.:-0.3175  
  Median :-0.2999   Median :-0.2999  
  Mean   :-0.3010   Mean   :-0.3010  
  3rd Qu.:-0.2863   3rd Qu.:-0.2862  
- Max.   :-0.2495   Max.   :-0.2495  </code></pre>
+ Max.   :-0.2494   Max.   :-0.2495  </code></pre>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>

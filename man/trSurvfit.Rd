@@ -4,8 +4,8 @@
 \alias{trSurvfit}
 \title{Estimating survival curves via structural transformation model}
 \usage{
-trSurvfit(trun, obs, delta = NULL, trans = "linear", plots = FALSE,
-  covariate = NULL, control = trSurv.control(), ...)
+trSurvfit(trun, obs, delta = NULL, tFun = "linear", plots = FALSE,
+  control = trSurv.control(), ...)
 }
 \arguments{
 \item{trun}{left truncation time satisfying \code{trun} <= \code{obs}.}
@@ -13,19 +13,19 @@ trSurvfit(trun, obs, delta = NULL, trans = "linear", plots = FALSE,
 \item{obs}{observed failure time, must be the same length as \code{trun}, might be right-censored.}
 
 \item{delta}{an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for \code{obs}.
-If this vector is not specified, \code{condKendall} assumes no censoring and all observed failure time
+If this vector is not specified, \code{cKendall} assumes no censoring and all observed failure time
 denote events.}
 
-\item{trans}{a character string specifying the transformation structure. The following are permitted:
+\item{tFun}{a character string specifying the transformation function or a user specified function indicating the relationship
+between \eqn{X}, \eqn{T}, and \eqn{a}.
+When \code{tFun} is a character, the following are permitted:
 \describe{
-  \item{linear}{linear transformation structure,}
-  \item{log}{log-linear transformation structure,}
+  \item{linear}{linear transformation structure;}
+  \item{log}{log-linear transformation structure;}
   \item{exp}{exponential transformation structure.}
 }}
 
 \item{plots}{an optional logical value; if TRUE, a series of diagnostic plots as well as the survival curve for the observed failure time will be plotted.}
-
-\item{covariate}{an optional logical value; if TRUE, covariates will be included in the output data.frame \code{qind}.}
 
 \item{control}{controls the lower and upper bounds when \code{trans} is an user specified function.}
 
@@ -34,43 +34,57 @@ denote events.}
 \value{
 The output contains the following components:
 \describe{
-  \item{Sy}{estimated survival function at the (ordered) observed points.}
-  \item{byTau}{a list contains the estimator of transformation parameter:
-    \code{par} is the best set of transformation parameter found;
-    \code{obj} is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.} 
-  \item{byP}{a list contains the estimator of transformation parameter:
-    \code{par} is the best set of transformation parameter found;
-    \code{obj} is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}
-  \item{qind}{a data frame consists of two quasi-independent variables:
-    \code{trun} is the transformed truncation time; 
-    \code{obs} is the corresponding uncensored failure time.}
+  \item{\code{surv}}{is a \code{data.frame} contains the survival probabilities estimates.}
+  \item{\code{byTau}}{a list contains the estimator of transformation parameter:
+    \describe{
+    \item{\code{par}}{is the best set of transformation parameter found;}
+    \item{\code{obj}}{is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}}
+  }
+  \item{\code{byP}}{a list contains the estimator of transformation parameter:
+    \describe{
+    \item{\code{par}}{is the best set of transformation parameter found;}
+    \item{\code{obj}}{is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}}
+  }
+  \item{\code{qind}}{a data frame consists of two quasi-independent variables:
+    \describe{
+    \item{\code{trun}}{ is the transformed truncation time;}
+    \item{\code{obs}}{ is the corresponding uncensored failure time.}}}
 }
 }
 \description{
 \code{trSurvfit} estimates survival curves under dependent truncation and independent censoring via a structural transformation model.
-A structural transformation model for a latent, quasi-independent truncation time as a function of the observed dependent truncation time and the event time, and an unknown dependence parameter.
-The dependence parameter is chosen to either minimize the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding p-value.
-The marginal distribution for the truncation time and the event time are completely left unspecified.
 }
 \details{
-The structure of the transformation model is of the form:
-\deqn{h(U) = (1 + a)^-1 * (h(T) + ah(X)),} where T is the truncation time, X is the observed failure time,
-U is the transformed truncation time that is quasi-independent from X and h(.) is a monotonic transformation function.
-The condition, T < X, is assumed to be satisfied.
-The quasi-independent truncation time, U, is obtained by inverting the test for quasi-independence by either minimizing
-the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding p-value.
+A structural transformation model assumes there is a latent, quasi-independent truncation time
+that is associated with the observed dependent truncation time, the event time, and an unknown dependence parameter
+through a specified funciton.
+The dependence parameter is chosen to either minimize the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \eqn{p}-value.
+The marginal distribution for the truncation time and the event time are completely left unspecified.
 
-At the current version, three transformation structures can be specified. \code{trans = "linear"} corresponds to \deqn{h(X) = 1};
-\code{trans = "log"} corresponds to \deqn{h(X) = log(X)};
-\code{trans = "exp"} corresponds to \deqn{h(X) = exp(X)}.
+The structure of the transformation model is of the form:
+\deqn{h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),} where \eqn{T} is the truncation time, \eqn{X} is the observed failure time,
+\eqn{U} is the transformed truncation time that is quasi-independent from \eqn{X} and \eqn{h(\cdot)} is a monotonic transformation function.
+The condition, \eqn{T < X}, is assumed to be satisfied.
+The quasi-independent truncation time, \eqn{U}, is obtained by inverting the test for quasi-independence by either minimizing
+the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \eqn{p}-value.
+
+At the current version, three transformation structures can be specified. \code{trans = "linear"} corresponds to \deqn{h(X) = 1;}
+\code{trans = "log"} corresponds to \deqn{h(X) = log(X);}
+\code{trans = "exp"} corresponds to \deqn{h(X) = exp(X).}
 }
 \examples{
-\dontrun{
 data(channing, package = "boot")
 chan <- subset(channing, sex == "Male" & entry < exit)
-fit <- with(chan, trSurvfit(entry, exit, cens))
-fit
-}
+
+## No display
+(fit <- with(chan, trSurvfit(entry, exit, cens)))
+
+## With diagnostic plots and the survival estimate
+with(chan, trSurvfit(entry, exit, cens, plots = TRUE))
+
+## Plots survival estimate
+
+plot(fit)
 }
 \references{
 Martin E. and Betensky R. A. (2005), Testing quasi-independence of failure and truncation times via conditional Kendall's tau,
@@ -79,5 +93,6 @@ Martin E. and Betensky R. A. (2005), Testing quasi-independence of failure and t
 Austin, M. D. and Betensky R. A. (2014), Eliminating bias due to censoring in Kendall's tau estimators for quasi-independence of truncation and failure,
 \emph{Computational Statistics & Data Analysis}, \bold{73}: 16-26.
 
-Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2016), Transformation model estimation of survival under dependent truncation and independent censoring, an unpublished manuscript.
+Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2018), Transformation model estimation of survival under dependent truncation and independent censoring,
+\emph{Statistical Methods in Medical Research}, \bold{28} (12): 3785-3798.
 }

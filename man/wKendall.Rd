@@ -12,12 +12,18 @@ wKendall(trun, obs, delta = NULL, weights = NULL)
 \item{obs}{observed failure time, must be the same length as \code{trun}, might be right-censored.}
 
 \item{delta}{an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for \code{obs}.
-If this vector is not specified, \code{condKendall} assumes no censoring and all observed failure time
+If this vector is not specified, \code{cKendall} assumes no censoring and all observed failure time
 denote events.}
 
-\item{weights}{perturbation weights.}
+\item{weights}{an optional perturbation weights.}
 }
 \description{
-This is a temporary function, could be merged into the main function \code{condKendall}.
-Give conditional Kendall's tau with the ability to take on perturbation weights.
+This is function computes the perturbed version of the conditional Kendall's tau.
+}
+\examples{
+data(channing, package = "boot")
+chan <- subset(channing, sex == "Male" & entry < exit)
+## When weights is not specified, this function reduces to condKendall()
+with(chan, wKendall(entry, exit, cens))
+mean(replicate(1000, with(chan, wKendall(entry, exit, cens, rexp(nrow(chan))))))
 }

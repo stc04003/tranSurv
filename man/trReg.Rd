@@ -10,6 +10,7 @@ trReg(formula, data, subset, tFun = "linear", method = c("kendall",
 \arguments{
 \item{formula}{a formula expression, of the form \code{response ~ predictors}.
 The \code{response} is assumed to be a \code{survival::Surv} object with both left truncation and right censoring.
+When there is no covariates, e.g., when the right hand side of the formula is \code{~ 1}, the \code{trReg()} function returns a \code{trSurvfit} object.
 See \code{?survival::Surv} for more details.}
 
 \item{data}{an optional data.frame in which to interpret the variables occurring
@@ -20,24 +21,24 @@ in the \code{formula}.}
 \item{tFun}{a character string specifying the transformation function or a user specified function indicating the relationship between X, T, and a.
 When \code{tFun} is a character, the following are permitted:
 \describe{
-  \item{linear}{linear transformation structure}
-  \item{log}{log-linear transformation structure}
-  \item{exp}{exponential transformation structure}
+  \item{linear}{linear transformation structure,}
+  \item{log}{log-linear transformation structure,}
+  \item{exp}{exponential transformation structure.}
 }}
 
-\item{method}{a character string specifying the underlying model. See \bold{Details}.}
+\item{method}{a character string specifying how the transformation parameter is estimated. The available options are \code{"kendall"} and \code{"adjust"}. See \bold{Details}.}
 
-\item{B}{a numerical value specifies the bootstrap size.
-When \code{B = 0}, the bootstrap standard errors will not be computed.}
+\item{B}{a numerical value specifies the bootstrap size for estimating the standard error.
+When \code{B = 0} (default), the bootstrap standard errors will not be computed.}
 
-\item{control}{ca list of control parameters. The following arguments are allowed:
+\item{control}{a list of control parameters. The following arguments are allowed:
 \describe{
   \item{\code{lower}}{The lower bound to search for the transformation parameter; default at -1.}
   \item{\code{upper}}{The upper bound to search for the transformation parameter; default at 20.}
   \item{\code{tol}}{The tolerance used in the search for the transformation parameter; default at 0.01.}
-  \item{\code{G}}{The number of grids used in the search for the transformation parameter; default at 50.
+  \item{\code{G}}{The number of grids used in the search for the transformation parameter; default is 50.
 A smaller \code{G} could results in faster search, but might be inaccurate.}
-  \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}.}
+  \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}. The default is 0.}
   \item{\code{parallel}}{an logical value indicating whether parallel computation will be applied when \code{B} is not 0.}
   \item{\code{parCl}}{an integer value specifying the number of CPU cores to be used when \code{parallel = TRUE}.
 The default value is half the CPU cores on the current host.}
@@ -46,11 +47,30 @@ The default value is half the CPU cores on the current host.}
 \description{
 \code{trReg} fits transformation model under dependent truncation and independent censoring via a structural transformation model.
 }
+\details{
+The main assumption on the structural transformation model is that it assumes there is a latent, quasi-independent truncation time
+that is associated with the observed dependent truncation time, the event time, and an unknown dependence parameter
+through a specified funciton.
+The structure of the transformation model is of the form:
+\deqn{h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),} where \eqn{T} is the truncation time, \eqn{X} is the observed failure time,
+\eqn{U} is the transformed truncation time that is quasi-independent from \eqn{X} and \eqn{h(\cdot)} is a monotonic transformation function.
+The condition, \eqn{T < X}, is assumed to be satisfied.
+The quasi-independent truncation time, \eqn{U}, is obtained by inverting the test for quasi-independence by one of the following methods:
+\describe{
+  \item{\code{method = "kendall"}}{ by minimizing the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \eqn{p}-value.
+This is the same procedure used in the \code{trSUrvfit()} function.}
+  \item{\code{method = "adjust"}}{ includes a function of latent truncation time, \eqn{U}, as a covariate.
+  A piece-wise function is constructed based on \code{Q+1} indicator functions on whether \eqn{U} falls in the \eqn{Q}th and the (\eqn{Q+1})th percentile,
+  where \eqn{Q} is the number of cutpoints used. See \code{control} for details. 
+  The transformation parameter, \eqn{a}, is then chosen to minimize the significance of the coefficient parameter.}}
+}
 \examples{
-library(survival)
 data(channing, package = "boot")
 chan <- subset(channing, entry < exit)
 trReg(Surv(entry, exit, cens) ~ sex, data = chan)
 trReg(Surv(entry, exit, cens) ~ sex, data = chan, method = "adjust", control = list(G = 10))
 
+}
+\seealso{
+\code{\link{trSurvfit}}
 }

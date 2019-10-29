@@ -17,11 +17,7 @@
 #'
 #' @seealso \code{\link{trSurvfit}}
 #' @export
-#' @examples
-#' ## Generate simulated data from transformation model
-#' data(channing, package = "boot")
-#' chan <- subset(channing, sex == "Male" & entry < exit & cens == 1)
-#' with(chan, pmcc(entry, exit)) ## cannot handle right censored data
+#' @example inst/examples/ex_pmcc.R
 pmcc <- function(trun, obs, a = 0, trans = "linear") {
     out <- NULL
     out$Call <- match.call()

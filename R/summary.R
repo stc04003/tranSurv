@@ -40,11 +40,27 @@ print.trSurvfit <- function(x, ...) {
 print.trReg <- function(x, ...) {
     cat("\n Call:")
     print(x$Call)
-    cat("\n   n =", nrow(x$.data), " number of events = ", sum(x$.data$status), "\n\n")
-    tab <- cbind(Estimate = round(x$PE[,1], 3), StdErr = round(x$SE, 3),
-                 z.value = round(x$PE[,1] / x$SE, 3),
-                 p.value = round(2 * pnorm(-abs(x$PE[,1] / x$SE)), 3))
+    cat("\n Sample size =", nrow(x$.data))
+    cat("\n Number of events = ", sum(x$.data$status))
+    cat("\n Transformation parameter is", x$a, "\n\n")
+    tab <- cbind(coef = round(x$PE[,1], 3),
+                 "se(coef)" = round(x$SE, 3),
+                 z = round(x$PE[,1] / x$SE, 3),
+                 "Pr(>|z|)" = round(2 * pnorm(-abs(x$PE[,1] / x$SE)), 3))
     rownames(tab) <- x$varNames
     printCoefmat(as.data.frame(tab), P.values = TRUE, has.Pvalue = TRUE)
-    cat("\n Transformation parameter is", x$a, "\n")
+    cat("\n")
+}
+
+#' @export
+print.trgof <- function(x, ...) {
+    cat("\n Overall signficances based on left-truncated regression model: p-value =", round(x$pval))
+    cat("\n Transformation model based on", x$Q, "segements.")
+    vv <- NULL
+    for (i in 1:(length(x$breaks) - 1)) vv[i] <- paste("(", x$breaks[i], ", ", x$breaks[i + 1], "]", sep = "")
+    cat("\n The segments are", paste(vv, collapse = " "), "\n\n")
+    if (!is.null(x$fit.all)) {
+        printCoefmat(round(coef(summary(x$fit.all)), 4), P.values = TRUE, has.Pvalue = TRUE)
+        cat("\n")
+    }
 }

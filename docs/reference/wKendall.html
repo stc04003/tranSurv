@@ -8,11 +8,13 @@
 
 <title>Weighted conditional Kendall's tau — wKendall • tranSurv</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -30,11 +32,11 @@
 
 
 
-<meta property="og:title" content="Weighted conditional Kendall's tau — wKendall" />
 
-<meta property="og:description" content="This is a temporary function, could be merged into the main function condKendall.
-Give conditional Kendall's tau with the ability to take on perturbation weights." />
+<meta property="og:title" content="Weighted conditional Kendall's tau — wKendall" />
+<meta property="og:description" content="This is function computes the perturbed version of the conditional Kendall's tau." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -64,7 +66,7 @@ Give conditional Kendall's tau with the ability to take on perturbation weights.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tranSurv</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -95,7 +97,6 @@ Give conditional Kendall's tau with the ability to take on perturbation weights.
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/stc04003/tranSurv">
@@ -121,14 +122,11 @@ Give conditional Kendall's tau with the ability to take on perturbation weights.
     </div>
 
     <div class="ref-description">
-    
-    <p>This is a temporary function, could be merged into the main function <code>condKendall</code>.
-Give conditional Kendall's tau with the ability to take on perturbation weights.</p>
-    
+    <p>This is function computes the perturbed version of the conditional Kendall's tau.</p>
     </div>
 
     <pre class="usage"><span class='fu'>wKendall</span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='kw'>delta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -143,22 +141,28 @@ Give conditional Kendall's tau with the ability to take on perturbation weights.
     <tr>
       <th>delta</th>
       <td><p>an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for <code>obs</code>.
-If this vector is not specified, <code>condKendall</code> assumes no censoring and all observed failure time
+If this vector is not specified, <code>cKendall</code> assumes no censoring and all observed failure time
 denote events.</p></td>
     </tr>
     <tr>
       <th>weights</th>
-      <td><p>perturbation weights.</p></td>
+      <td><p>an optional perturbation weights.</p></td>
     </tr>
     </table>
-    
 
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>channing</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"boot"</span>)
+<span class='no'>chan</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/subset'>subset</a></span>(<span class='no'>channing</span>, <span class='no'>sex</span> <span class='kw'>==</span> <span class='st'>"Male"</span> <span class='kw'>&amp;</span> <span class='no'>entry</span> <span class='kw'>&lt;</span> <span class='no'>exit</span>)
+<span class='co'>## When weights is not specified, this function reduces to condKendall()</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>chan</span>, <span class='fu'>wKendall</span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>))</div><div class='output co'>#&gt; [1] 0.1966783</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/lapply'>replicate</a></span>(<span class='fl'>1000</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>chan</span>, <span class='fu'>wKendall</span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Exponential'>rexp</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>chan</span>))))))</div><div class='output co'>#&gt; [1] 0.1925768</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

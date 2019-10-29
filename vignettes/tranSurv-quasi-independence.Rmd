@@ -37,7 +37,7 @@ library(tranSurv)
 packageVersion("tranSurv")
 ```
 
-## (Unconditional) Kendall's tau
+## Unconditional Kendall's tau
 Suppose we have the correlated data generated from the following codes with the __`copula`__ package:
 ```{R}
 library(copula)
@@ -81,15 +81,15 @@ head(dat)
 ```
 The __`tranSurv`__ package provides three implementations of conditional Kendall's tau ($\tau_c$)
 for left-truncated, right-censored data.
-These implementations are called with function `condKendall`, whose arguments are as follows:
+These implementations are called with function `cKendall`, whose arguments are as follows:
 ```{R}
-args(condKendall)
+args(cKendall)
 ```
 
 - `trun` left truncation time satisfying `trun <= obs`.
 - `obs` observed failure time. Must be the same length as `trun`, and might be right-censored.
 - `delta` an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for `obs`. 
-If this vector is not specified, `condKendall` assumes all observed failure times are events.
+If this vector is not specified, `cKendall` assumes all observed failure times are events.
 - `method` a character string specifying the different version of conditional Kendall's tau to be computed. 
 The possible methods are: 
     - `MB` conditional Kendall's tau proposed in @tsai1990testing and @martin2005testing
@@ -110,39 +110,39 @@ $$\widetilde\tau_c = \frac{1}{M}\sum_{i = 1}^{n - 1}\sum_{j = i + 1}^n \mbox{sgn
 where $\Lambda_{ij} = \{\max(T_i, T_j)\le \min(Y_i, Y_j)\}\cap \{\Delta_{ij}^{(1)}=1\}$, 
 $\Delta_{ij}^{(1)} = 1$ if $\min{Y_i, Y_j}$ is not a censored event and 0 otherwise. 
 The notation $\Lambda_{ij}$ ensures $Y_i$ and $Y_j$ are orderable and comparable.
-The corresponding quasi-independence test can be called with the function `condKendall`
+The corresponding quasi-independence test can be called with the function `cKendall`
 ```{R}
-condKendall(dat$T, dat$Y, dat$delta)
+cKendall(dat$T, dat$Y, dat$delta)
 ```
 where the asymptotic variance is computed using the asymptotic U-statistic variance outlined in Section 6 of 
 @martin2005testing.
 The conditional Kendall's tau value and the corresponding $p$-value can be called individually:
 ```{R}
-condKendall(dat$T, dat$Y, dat$delta)$PE
-condKendall(dat$T, dat$Y, dat$delta)$p.value
+cKendall(dat$T, dat$Y, dat$delta)$PE
+cKendall(dat$T, dat$Y, dat$delta)$p.value
 ```
 
 #### @austin2014eliminating
 
 @austin2014eliminating proposed an inverse probability weighted versions of the conditional Kendall's tau estimator.
-When `method = "IPW1"`, `condKendall` compute the conditional Kendall's tau defined as $\widehat\tau_{c2}$ 
+When `method = "IPW1"`, `cKendall` compute the conditional Kendall's tau defined as $\widehat\tau_{c2}$ 
 in Section 4 of @austin2014eliminating.
 
 ```{R}
-condKendall(dat$T, dat$Y, dat$delta, method = "IPW1")
+cKendall(dat$T, dat$Y, dat$delta, method = "IPW1")
 ```
 
 #### @austin2014eliminating
 
-When `method = "IPW2"`, `condKendall` compute the conditional Kendall's tau defined as $\widehat\tau_{c3}$
+When `method = "IPW2"`, `cKendall` compute the conditional Kendall's tau defined as $\widehat\tau_{c3}$
 in Section 4 of @austin2014eliminating.
 
 ```{R}
-condKendall(dat$T, dat$Y, dat$delta, method = "IPW2")
+cKendall(dat$T, dat$Y, dat$delta, method = "IPW2")
 ```
 
 ## Channing House study
-We illustrate the use of `condKendall` on the Channing House data set, 
+We illustrate the use of `cKendall` on the Channing House data set, 
 which consists of 96 male retirees from their entry to the Channing House retirement community. 
 The data can be prepared with the following codes.
 ```{R}
@@ -152,9 +152,9 @@ chan <- subset(channing, sex == "Male" & exit > entry)
 The conditional Kendall's tau values and the associated $p$-value with the different methods are:
 ```{R}
 attach(chan)
-condKendall(entry, exit, cens)
-condKendall(entry, exit, cens, method = "IPW1")
-condKendall(entry, exit, cens, method = "IPW2")
+cKendall(entry, exit, cens)
+cKendall(entry, exit, cens, method = "IPW1")
+cKendall(entry, exit, cens, method = "IPW2")
 detach(chan)
 ```
 The results are similar to these reported in @austin2014eliminating.
