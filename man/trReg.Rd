@@ -60,7 +60,7 @@ The quasi-independent truncation time, \eqn{U}, is obtained by inverting the tes
   \item{\code{method = "kendall"}}{ by minimizing the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \eqn{p}-value.
 This is the same procedure used in the \code{trSUrvfit()} function.}
   \item{\code{method = "adjust"}}{ includes a function of latent truncation time, \eqn{U}, as a covariate.
-  A piece-wise function is constructed based on \code{Q+1} indicator functions on whether \eqn{U} falls in the \eqn{Q}th and the \eqn{Q+1}th percentile,
+  A piece-wise function is constructed based on \code{Q+1} indicator functions on whether \eqn{U} falls in the \eqn{Q}th and the (\eqn{Q+1})th percentile,
   where \eqn{Q} is the number of cutpoints used. See \code{control} for details. 
   The transformation parameter, \eqn{a}, is then chosen to minimize the significance of the coefficient parameter.}}
 }

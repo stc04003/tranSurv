@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Weighted conditional Kendall's tau — wKendall • tranSurv</title>
+<title>Goodness of fit based on left-truncated regression model — gof • tranSurv</title>
 
 
 <!-- jquery -->
@@ -33,8 +33,8 @@
 
 
 
-<meta property="og:title" content="Weighted conditional Kendall's tau — wKendall" />
-<meta property="og:description" content="This is function computes the perturbed version of the conditional Kendall's tau." />
+<meta property="og:title" content="Goodness of fit based on left-truncated regression model — gof" />
+<meta property="og:description" content="Provide goodness-of-fit diagnostics for the transformation model." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -116,51 +116,83 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Weighted conditional Kendall's tau</h1>
-    <small class="dont-index">Source: <a href='https://github.com/stc04003/tranSurv/blob/master/R/wKendall.R'><code>R/wKendall.R</code></a></small>
-    <div class="hidden name"><code>wKendall.Rd</code></div>
+    <h1>Goodness of fit based on left-truncated regression model</h1>
+    <small class="dont-index">Source: <a href='https://github.com/stc04003/tranSurv/blob/master/R/gof.R'><code>R/gof.R</code></a></small>
+    <div class="hidden name"><code>gof.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This is function computes the perturbed version of the conditional Kendall's tau.</p>
+    <p>Provide goodness-of-fit diagnostics for the transformation model.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>wKendall</span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='kw'>delta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>gof</span>(<span class='no'>x</span>, <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>Q</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>trun</th>
-      <td><p>left truncation time satisfying <code>trun</code> &lt;= <code>obs</code>.</p></td>
+      <th>x</th>
+      <td><p>an object of class <code>trSurvfit</code> returned by the
+<code><a href='trSurvfit.html'>trSurvfit()</a></code> or the <code><a href='trReg.html'>trReg()</a></code> function.</p></td>
     </tr>
     <tr>
-      <th>obs</th>
-      <td><p>observed failure time, must be the same length as <code>trun</code>, might be right-censored.</p></td>
+      <th>B</th>
+      <td><p>a integer value specifies the bootstrap size.</p></td>
     </tr>
     <tr>
-      <th>delta</th>
-      <td><p>an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for <code>obs</code>.
-If this vector is not specified, <code>cKendall</code> assumes no censoring and all observed failure time
-denote events.</p></td>
-    </tr>
-    <tr>
-      <th>weights</th>
-      <td><p>an optional perturbation weights.</p></td>
+      <th>Q</th>
+      <td><p>a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A list containing the following elements</p><dl class='dl-horizontal'>
+  <dt>coefficients</dt><dd><p>the regression coefficients of the left-truncated regression model.</p></dd>
+  <dt>pval</dt><dd><p>the p-value for the equality of the piecewise linearity terms in the expanded model. See <b>Details</b>.</p></dd>
+</dl>
+
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The googness of fit assessment of the transformation model focus on the structure of the
+transformation model, which has the form:
+$$h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),$$
+where \(T\) is the truncation time, \(X\) is the observed failure time,
+\(U\) is the transformed truncation time that is quasi-independent from \(X\) and
+\(h(\cdot)\) is a monotonic transformation function.
+With the condition, \(T &lt; X\), assumed to be satisfied,
+the structure of the transformation model implies
+$$X - T = -(1 + a) E(U) + (1 + a) X - (1 + a) \times [U - E(U)] := \beta_0 + \beta_1X + \epsilon.$$
+The regression estimates can be obtained by the left-truncated regression model (Karlsson and Lindmark, 2014).
+To evaluate the goodness of fit of the transformation model,
+the <code>gof()</code> function directly test the inearity in \(X\) by considering larger model that are nonlinear in \(X\).
+In particular, we expand the covariates \(X\) to <code>Q</code> piecewise linearity terms and test for equality of the associated coefficients.</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Karlsson, M., Lindmark, A. (2014) truncSP: An R Package for Estimation of Semi-Parametric Truncated Linear Regression Models, <em>Journal of Statistical Software</em>, <b>57</b> (14), pp 1--19.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>channing</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"boot"</span>)
-<span class='no'>chan</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/subset'>subset</a></span>(<span class='no'>channing</span>, <span class='no'>sex</span> <span class='kw'>==</span> <span class='st'>"Male"</span> <span class='kw'>&amp;</span> <span class='no'>entry</span> <span class='kw'>&lt;</span> <span class='no'>exit</span>)
-<span class='co'>## When weights is not specified, this function reduces to condKendall()</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>chan</span>, <span class='fu'>wKendall</span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>))</div><div class='output co'>#&gt; [1] 0.1966783</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/lapply'>replicate</a></span>(<span class='fl'>1000</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>chan</span>, <span class='fu'>wKendall</span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Exponential'>rexp</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>chan</span>))))))</div><div class='output co'>#&gt; [1] 0.1925768</div></pre>
+<span class='no'>chan</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/subset'>subset</a></span>(<span class='no'>channing</span>, <span class='no'>entry</span> <span class='kw'>&lt;</span> <span class='no'>exit</span>)
+<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='trReg.html'>trReg</a></span>(<span class='fu'><a href='Surv.html'>Surv</a></span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>) ~ <span class='no'>sex</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>chan</span>)
+<span class='fu'>gof</span>(<span class='no'>fit</span>, <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>25</span>)</div><div class='output co'>#&gt; 
+#&gt;  Overall signficances based on left-truncated regression model: p-value = 0
+#&gt;  Transformation model based on 1 segements.
+#&gt;  The segments are (777, 992] (992, 1207] 
+#&gt; 
+#&gt;           coef exp(coef) se(coef)      z  Pr(&gt;|z|)    
+#&gt; sexMale 0.4682    1.5971   0.1145 4.0887 &lt; 2.2e-16 ***
+#&gt; ---
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
+      <li><a href="#references">References</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

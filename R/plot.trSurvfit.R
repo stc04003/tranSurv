@@ -6,7 +6,8 @@
 #' @export
 #'
 #' @param x an object of class \code{trSurvfit} returned by the \code{trSurvfit()} or the \code{trReg()} function.
-#'
+#' @param ... graphical parameters to be passed to methods.
+#' 
 #' @return A \code{ggplot} object.
 #' @example inst/examples/ex_plot_trSurvfit.R
 #' 

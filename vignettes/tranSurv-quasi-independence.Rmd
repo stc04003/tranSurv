@@ -37,7 +37,7 @@ library(tranSurv)
 packageVersion("tranSurv")
 ```
 
-## (Unconditional) Kendall's tau
+## Unconditional Kendall's tau
 Suppose we have the correlated data generated from the following codes with the __`copula`__ package:
 ```{R}
 library(copula)

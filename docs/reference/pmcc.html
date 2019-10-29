@@ -8,11 +8,13 @@
 
 <title>Product-Moment Correlation Coefficient — pmcc • tranSurv</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -30,11 +32,12 @@
 
 
 
-<meta property="og:title" content="Product-Moment Correlation Coefficient — pmcc" />
 
+<meta property="og:title" content="Product-Moment Correlation Coefficient — pmcc" />
 <meta property="og:description" content="pmcc computes the conditional product-moment correlation coefficient proposed by Chen et al. (1996).
 The conditional product-moment correlation coefficient uses only the uncensored events." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -64,7 +67,7 @@ The conditional product-moment correlation coefficient uses only the uncensored 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tranSurv</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -95,7 +98,6 @@ The conditional product-moment correlation coefficient uses only the uncensored 
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/stc04003/tranSurv">
@@ -121,14 +123,12 @@ The conditional product-moment correlation coefficient uses only the uncensored 
     </div>
 
     <div class="ref-description">
-    
     <p><code>pmcc</code> computes the conditional product-moment correlation coefficient proposed by Chen et al. (1996).
 The conditional product-moment correlation coefficient uses only the uncensored events.</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>pmcc</span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>trans</span> <span class='kw'>=</span> <span class='st'>"linear"</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -155,41 +155,28 @@ See <code>?tranSurvfit</code> for the transformation model structure.</p></td>
 </dl></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='trSurvfit.html'>trSurvfit</a></code></p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>## Generate simulated data from transformation model</span>
-<span class='no'>datgen</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>n</span>) {
-    <span class='no'>a</span> <span class='kw'>&lt;-</span> -<span class='fl'>0.3</span>
-    <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Weibull'>rweibull</a></span>(<span class='no'>n</span>, <span class='fl'>2</span>, <span class='fl'>4</span>) <span class='co'>## failure times</span>
-    <span class='no'>U</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Weibull'>rweibull</a></span>(<span class='no'>n</span>, <span class='fl'>2</span>, <span class='fl'>1</span>) <span class='co'>## latent truncation time</span>
-    <span class='no'>T</span> <span class='kw'>&lt;-</span> (<span class='fl'>1</span> + <span class='no'>a</span>) * <span class='no'>U</span> - <span class='no'>a</span> * <span class='no'>X</span> <span class='co'>## apply transformation</span>
-    <span class='no'>C</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Lognormal'>rlnorm</a></span>(<span class='no'>n</span>, <span class='fl'>.8</span>, <span class='fl'>1</span>) <span class='co'>## censoring</span>
-    <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>trun</span> <span class='kw'>=</span> <span class='no'>T</span>, <span class='kw'>obs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>pmin</a></span>(<span class='no'>X</span>, <span class='no'>C</span>), <span class='kw'>delta</span> <span class='kw'>=</span> <span class='fl'>1</span> * (<span class='no'>X</span> <span class='kw'>&lt;=</span> <span class='no'>C</span>))
-    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/function'>return</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/subset'>subset</a></span>(<span class='no'>dat</span>, <span class='no'>trun</span> <span class='kw'>&lt;=</span> <span class='no'>obs</span>))
-}
-
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>datgen</span>(<span class='fl'>300</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>dat</span>, <span class='fu'>pmcc</span>(<span class='no'>trun</span>, <span class='no'>obs</span>))</div><div class='output co'>#&gt; 
+<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>channing</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"boot"</span>)
+<span class='no'>chan</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/subset'>subset</a></span>(<span class='no'>channing</span>, <span class='no'>sex</span> <span class='kw'>==</span> <span class='st'>"Male"</span> <span class='kw'>&amp;</span> <span class='no'>entry</span> <span class='kw'>&lt;</span> <span class='no'>exit</span> <span class='kw'>&amp;</span> <span class='no'>cens</span> <span class='kw'>==</span> <span class='fl'>1</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>chan</span>, <span class='fu'>pmcc</span>(<span class='no'>entry</span>, <span class='no'>exit</span>)) <span class='co'>## cannot handle right censored data</span></div><div class='output co'>#&gt; 
 #&gt;  Test for quasi-independence with conditional correlation coefficient
 #&gt; 
-#&gt;  Call: pmcc(trun = trun, obs = obs)
+#&gt;  Call: pmcc(trun = entry, obs = exit)
 #&gt; 
-#&gt;  Correlation coefficient = 0.4241 , SE = 0.0025 , Z = 8.5436 , p-value =  0 
+#&gt;  Correlation coefficient = 0.4688 , SE = 0.0053 , Z = 6.4198 , p-value =  0 
 #&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#see-also">See also</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

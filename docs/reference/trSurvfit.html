@@ -8,11 +8,13 @@
 
 <title>Estimating survival curves via structural transformation model — trSurvfit • tranSurv</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -30,13 +32,11 @@
 
 
 
-<meta property="og:title" content="Estimating survival curves via structural transformation model — trSurvfit" />
 
-<meta property="og:description" content="trSurvfit estimates survival curves under dependent truncation and independent censoring via a structural transformation model.
-A structural transformation model for a latent, quasi-independent truncation time as a function of the observed dependent truncation time and the event time, and an unknown dependence parameter.
-The dependence parameter is chosen to either minimize the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding p-value.
-The marginal distribution for the truncation time and the event time are completely left unspecified." />
+<meta property="og:title" content="Estimating survival curves via structural transformation model — trSurvfit" />
+<meta property="og:description" content="trSurvfit estimates survival curves under dependent truncation and independent censoring via a structural transformation model." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -66,7 +66,7 @@ The marginal distribution for the truncation time and the event time are complet
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tranSurv</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -97,7 +97,6 @@ The marginal distribution for the truncation time and the event time are complet
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/stc04003/tranSurv">
@@ -123,17 +122,12 @@ The marginal distribution for the truncation time and the event time are complet
     </div>
 
     <div class="ref-description">
-    
-    <p><code>trSurvfit</code> estimates survival curves under dependent truncation and independent censoring via a structural transformation model.
-A structural transformation model for a latent, quasi-independent truncation time as a function of the observed dependent truncation time and the event time, and an unknown dependence parameter.
-The dependence parameter is chosen to either minimize the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding p-value.
-The marginal distribution for the truncation time and the event time are completely left unspecified.</p>
-    
+    <p><code>trSurvfit</code> estimates survival curves under dependent truncation and independent censoring via a structural transformation model.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>trSurvfit</span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='kw'>delta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>trans</span> <span class='kw'>=</span> <span class='st'>"linear"</span>, <span class='kw'>plots</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>covariate</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='trSurv.control.html'>trSurv.control</a></span>(), <span class='no'>...</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>trSurvfit</span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='kw'>delta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>tFun</span> <span class='kw'>=</span> <span class='st'>"linear"</span>, <span class='kw'>plots</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='trSurv.control.html'>trSurv.control</a></span>(), <span class='no'>...</span>)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -148,24 +142,22 @@ The marginal distribution for the truncation time and the event time are complet
     <tr>
       <th>delta</th>
       <td><p>an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for <code>obs</code>.
-If this vector is not specified, <code>condKendall</code> assumes no censoring and all observed failure time
+If this vector is not specified, <code>cKendall</code> assumes no censoring and all observed failure time
 denote events.</p></td>
     </tr>
     <tr>
-      <th>trans</th>
-      <td><p>a character string specifying the transformation structure. The following are permitted:</p><dl class='dl-horizontal'>
-  <dt>linear</dt><dd><p>linear transformation structure,</p></dd>
-  <dt>log</dt><dd><p>log-linear transformation structure,</p></dd>
+      <th>tFun</th>
+      <td><p>a character string specifying the transformation function or a user specified function indicating the relationship
+between \(X\), \(T\), and \(a\).
+When <code>tFun</code> is a character, the following are permitted:</p><dl class='dl-horizontal'>
+  <dt>linear</dt><dd><p>linear transformation structure;</p></dd>
+  <dt>log</dt><dd><p>log-linear transformation structure;</p></dd>
   <dt>exp</dt><dd><p>exponential transformation structure.</p></dd>
 </dl></td>
     </tr>
     <tr>
       <th>plots</th>
       <td><p>an optional logical value; if TRUE, a series of diagnostic plots as well as the survival curve for the observed failure time will be plotted.</p></td>
-    </tr>
-    <tr>
-      <th>covariate</th>
-      <td><p>an optional logical value; if TRUE, covariates will be included in the output data.frame <code>qind</code>.</p></td>
     </tr>
     <tr>
       <th>control</th>
@@ -176,84 +168,87 @@ denote events.</p></td>
       <td><p>for future methods.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>The output contains the following components:</p><dl class='dl-horizontal'>
-  <dt>Sy</dt><dd><p>estimated survival function at the (ordered) observed points.</p></dd>
-  <dt>byTau</dt><dd><p>a list contains the estimator of transformation parameter:
-    <code>par</code> is the best set of transformation parameter found;
-    <code>obj</code> is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.</p></dd> 
-  <dt>byP</dt><dd><p>a list contains the estimator of transformation parameter:
-    <code>par</code> is the best set of transformation parameter found;
-    <code>obj</code> is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.</p></dd>
-  <dt>qind</dt><dd><p>a data frame consists of two quasi-independent variables:
-    <code>trun</code> is the transformed truncation time; 
-    <code>obs</code> is the corresponding uncensored failure time.</p></dd>
+  <dt><code>surv</code></dt><dd><p>is a <code>data.frame</code> contains the survival probabilities estimates.</p></dd>
+  <dt><code>byTau</code></dt><dd><p>a list contains the estimator of transformation parameter:
+    <dl class='dl-horizontal'>
+    <dt><code>par</code></dt><dd><p>is the best set of transformation parameter found;</p></dd>
+    <dt><code>obj</code></dt><dd><p>is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.</p></dd></dl></p></dd>
+  <dt><code>byP</code></dt><dd><p>a list contains the estimator of transformation parameter:
+    <dl class='dl-horizontal'>
+    <dt><code>par</code></dt><dd><p>is the best set of transformation parameter found;</p></dd>
+    <dt><code>obj</code></dt><dd><p>is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.</p></dd></dl></p></dd>
+  <dt><code>qind</code></dt><dd><p>a data frame consists of two quasi-independent variables:
+    <dl class='dl-horizontal'>
+    <dt><code>trun</code></dt><dd><p>is the transformed truncation time;</p></dd>
+    <dt><code>obs</code></dt><dd><p>is the corresponding uncensored failure time.</p></dd></dl></p></dd>
 </dl>
 
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The structure of the transformation model is of the form:
-$$h(U) = (1 + a)^-1 * (h(T) + ah(X)),$$ where T is the truncation time, X is the observed failure time,
-U is the transformed truncation time that is quasi-independent from X and h(.) is a monotonic transformation function.
-The condition, T &lt; X, is assumed to be satisfied.
-The quasi-independent truncation time, U, is obtained by inverting the test for quasi-independence by either minimizing
-the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding p-value.</p>
-<p>At the current version, three transformation structures can be specified. <code>trans = "linear"</code> corresponds to $$h(X) = 1$$;
-<code>trans = "log"</code> corresponds to $$h(X) = log(X)$$;
-<code>trans = "exp"</code> corresponds to $$h(X) = exp(X)$$.</p>
-    
+    <p>A structural transformation model assumes there is a latent, quasi-independent truncation time
+that is associated with the observed dependent truncation time, the event time, and an unknown dependence parameter
+through a specified funciton.
+The dependence parameter is chosen to either minimize the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \(p\)-value.
+The marginal distribution for the truncation time and the event time are completely left unspecified.</p>
+<p>The structure of the transformation model is of the form:
+$$h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),$$ where \(T\) is the truncation time, \(X\) is the observed failure time,
+\(U\) is the transformed truncation time that is quasi-independent from \(X\) and \(h(\cdot)\) is a monotonic transformation function.
+The condition, \(T &lt; X\), is assumed to be satisfied.
+The quasi-independent truncation time, \(U\), is obtained by inverting the test for quasi-independence by either minimizing
+the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \(p\)-value.</p>
+<p>At the current version, three transformation structures can be specified. <code>trans = "linear"</code> corresponds to $$h(X) = 1;$$
+<code>trans = "log"</code> corresponds to $$h(X) = log(X);$$
+<code>trans = "exp"</code> corresponds to $$h(X) = exp(X).$$</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Martin E. and Betensky R. A. (2005), Testing quasi-independence of failure and truncation times via conditional Kendall's tau,
 <em>Journal of the American Statistical Association</em>, <b>100</b> (470): 484-492.</p>
 <p>Austin, M. D. and Betensky R. A. (2014), Eliminating bias due to censoring in Kendall's tau estimators for quasi-independence of truncation and failure,
 <em>Computational Statistics &amp; Data Analysis</em>, <b>73</b>: 16-26.</p>
-<p>Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2016), Transformation model estimation of survival under dependent truncation and independent censoring, an unpublished manuscript.</p>
-    
+<p>Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2018), Transformation model estimation of survival under dependent truncation and independent censoring,
+<em>Statistical Methods in Medical Research</em>, <b>28</b> (12): 3785-3798.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>## Generate simulated data from a transformation model</span>
-<span class='no'>datgen</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>n</span>) {
-    <span class='no'>a</span> <span class='kw'>&lt;-</span> -<span class='fl'>0.3</span>
-    <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Weibull'>rweibull</a></span>(<span class='no'>n</span>, <span class='fl'>2</span>, <span class='fl'>4</span>) <span class='co'>## failure times</span>
-    <span class='no'>U</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Weibull'>rweibull</a></span>(<span class='no'>n</span>, <span class='fl'>2</span>, <span class='fl'>1</span>) <span class='co'>## latent truncation time</span>
-    <span class='no'>T</span> <span class='kw'>&lt;-</span> (<span class='fl'>1</span> + <span class='no'>a</span>) * <span class='no'>U</span> - <span class='no'>a</span> * <span class='no'>X</span> <span class='co'>## apply transformation</span>
-    <span class='no'>C</span> <span class='kw'>&lt;-</span> <span class='fl'>10</span> <span class='co'>## censoring</span>
-    <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>trun</span> <span class='kw'>=</span> <span class='no'>T</span>, <span class='kw'>obs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>pmin</a></span>(<span class='no'>X</span>, <span class='no'>C</span>), <span class='kw'>delta</span> <span class='kw'>=</span> <span class='fl'>1</span> * (<span class='no'>X</span> <span class='kw'>&lt;=</span> <span class='no'>C</span>))
-    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/function'>return</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/subset'>subset</a></span>(<span class='no'>dat</span>, <span class='no'>trun</span> <span class='kw'>&lt;=</span> <span class='no'>obs</span>))
-}
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>channing</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"boot"</span>)
+<span class='no'>chan</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/subset'>subset</a></span>(<span class='no'>channing</span>, <span class='no'>sex</span> <span class='kw'>==</span> <span class='st'>"Male"</span> <span class='kw'>&amp;</span> <span class='no'>entry</span> <span class='kw'>&lt;</span> <span class='no'>exit</span>)
 
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>datgen</span>(<span class='fl'>300</span>)
-<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>dat</span>, <span class='fu'>trSurvfit</span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='no'>delta</span>))
-<span class='no'>fit</span></div><div class='output co'>#&gt; 
+<span class='co'>## No display</span>
+(<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>chan</span>, <span class='fu'>trSurvfit</span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>)))</div><div class='output co'>#&gt; 
 #&gt;  Fitting structural transformation model 
 #&gt; 
-#&gt;  Call: trSurvfit(trun = trun, obs = obs, delta = delta)
+#&gt;  Call: trSurvfit(trun = entry, obs = exit, delta = cens)
 #&gt; 
-#&gt;  Conditional Kendall's tau = 0.5145 , p-value = 0
-#&gt;  Restricted inverse probability weighted Kendall's tau = 0.5126 , p-value = 0
-#&gt;  Transformation parameter by minimizing absolute value of Kendall's tau: -0.2847
-#&gt;  Transformation parameter by maximizing p-value of the test: -0.2847 
+#&gt;  Conditional Kendall's tau = 0.1967 , p-value = 0.0401
+#&gt;  Restricted inverse probability weighted Kendall's tau = 0.425 , p-value = 0.0146
+#&gt;  Transformation parameter by minimizing absolute value of Kendall's tau: -0.9231
+#&gt;  Transformation parameter by maximizing p-value of the test: -0.9231 
 #&gt; </div><div class='input'>
-<span class='co'>## Checking the transformation parameter</span>
-<span class='no'>fit</span>$<span class='no'>byTau</span>$<span class='no'>par</span></div><div class='output co'>#&gt; [1] -0.2847304</div><div class='input'><span class='no'>fit</span>$<span class='no'>byTau</span>$<span class='no'>obj</span></div><div class='output co'>#&gt; [1] 2.748234e-05</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>dat</span>, <span class='fu'><a href='condKendall.html'>condKendall</a></span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='no'>delta</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"IPW2"</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='no'>fit</span>$<span class='no'>byTau</span>$<span class='no'>par</span>[<span class='fl'>1</span>]))$<span class='no'>PE</span></div><div class='output co'>#&gt; [1] 2.748234e-05</div><div class='input'>
-<span class='no'>fit</span>$<span class='no'>byP</span>$<span class='no'>par</span></div><div class='output co'>#&gt; [1] -0.2847304</div><div class='input'><span class='no'>fit</span>$<span class='no'>byP</span>$<span class='no'>obj</span></div><div class='output co'>#&gt; [1] 0.9994397</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>dat</span>, <span class='fu'><a href='condKendall.html'>condKendall</a></span>(<span class='no'>trun</span>, <span class='no'>obs</span>, <span class='no'>delta</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"IPW2"</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='no'>fit</span>$<span class='no'>byP</span>$<span class='no'>par</span>[<span class='fl'>1</span>]))$<span class='no'>p.value</span></div><div class='output co'>#&gt; [1] 0.9994397</div></pre>
+<span class='co'>## With diagnostic plots and the survival estimate</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>chan</span>, <span class='fu'>trSurvfit</span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>, <span class='kw'>plots</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='img'><img src='trSurvfit-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='trSurvfit-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='trSurvfit-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; 
+#&gt;  Fitting structural transformation model 
+#&gt; 
+#&gt;  Call: trSurvfit(trun = entry, obs = exit, delta = cens, plots = TRUE)
+#&gt; 
+#&gt;  Conditional Kendall's tau = 0.1967 , p-value = 0.0401
+#&gt;  Restricted inverse probability weighted Kendall's tau = 0.425 , p-value = 0.0146
+#&gt;  Transformation parameter by minimizing absolute value of Kendall's tau: -0.9212
+#&gt;  Transformation parameter by maximizing p-value of the test: -0.9212 
+#&gt; </div><div class='input'>
+<span class='co'>## Plots survival estimate</span>
+
+<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>fit</span>)</div><div class='img'><img src='trSurvfit-4.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
       <li><a href="#references">References</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

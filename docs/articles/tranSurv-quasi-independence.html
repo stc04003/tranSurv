@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tranSurv</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -83,7 +83,7 @@
       <h1>Testing quasi-independence</h1>
                         <h4 class="author">Steven Chiou</h4>
             
-            <h4 class="date">2019-05-22</h4>
+            <h4 class="date">2019-10-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stc04003/tranSurv/blob/master/vignettes/tranSurv-quasi-independence.Rmd"><code>vignettes/tranSurv-quasi-independence.Rmd</code></a></small>
       <div class="hidden name"><code>tranSurv-quasi-independence.Rmd</code></div>
@@ -97,25 +97,25 @@
 <h2 class="hasAnchor">
 <a href="#loading-package" class="anchor"></a>Loading package</h2>
 <p>The <strong><code>tranSurv</code></strong> package can be installed from CRAN with</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"tranSurv"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"tranSurv"</span>)</code></pre></div>
 <p>or from GitHub with</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>devtools::<span class="kw">install_github</span>(<span class="st">"stc04003/tranSurv"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/remote-reexports">install_github</a></span>(<span class="st">"stc04003/tranSurv"</span>)</code></pre></div>
 <p>Once installed, the <strong><code>tranSurv</code></strong> package can be loaded with</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tranSurv)
-&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/packageDescription">packageVersion</a></span>(<span class="st">"tranSurv"</span>)</code></pre></div>
-<pre><code>[1] '1.2.0'</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tranSurv)
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/packageDescription">packageVersion</a></span>(<span class="st">"tranSurv"</span>)</code></pre></div>
+<pre><code>[1] '1.2.1'</code></pre>
 </div>
 <div id="unconditional-kendalls-tau" class="section level2">
 <h2 class="hasAnchor">
-<a href="#unconditional-kendalls-tau" class="anchor"></a>(Unconditional) Kendall’s tau</h2>
+<a href="#unconditional-kendalls-tau" class="anchor"></a>Unconditional Kendall’s tau</h2>
 <p>Suppose we have the correlated data generated from the following codes with the <strong><code>copula</code></strong> package:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(copula)
-&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">1</span>)
-&gt;<span class="st"> </span>rho &lt;-<span class="st"> </span><span class="kw">iTau</span>(<span class="kw">normalCopula</span>(<span class="dt">dim =</span> <span class="dv">2</span>), .<span class="dv">5</span>) ## convert kendall's tau to pearson's rho
-&gt;<span class="st"> </span>dat &lt;-<span class="st"> </span><span class="kw">rCopula</span>(<span class="dv">3000</span>, <span class="kw">normalCopula</span>(rho, <span class="dt">dim =</span> <span class="dv">2</span>)) 
-&gt;<span class="st"> </span>dat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Weibull">qweibull</a></span>(dat, <span class="dv">2</span>, <span class="dv">1</span>))
-&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(dat) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"T"</span>, <span class="st">"X"</span>)
-&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(dat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(copula)
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">1</span>)
+<span class="op">&gt;</span><span class="st"> </span>rho &lt;-<span class="st"> </span><span class="kw">iTau</span>(<span class="kw">normalCopula</span>(<span class="dt">dim =</span> <span class="dv">2</span>), <span class="fl">.5</span>) ## convert kendall's tau to pearson's rho
+<span class="op">&gt;</span><span class="st"> </span>dat &lt;-<span class="st"> </span><span class="kw">rCopula</span>(<span class="dv">3000</span>, <span class="kw">normalCopula</span>(rho, <span class="dt">dim =</span> <span class="dv">2</span>)) 
+<span class="op">&gt;</span><span class="st"> </span>dat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Weibull">qweibull</a></span>(dat, <span class="dv">2</span>, <span class="dv">1</span>))
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(dat) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"T"</span>, <span class="st">"X"</span>)
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(dat)</code></pre></div>
 <pre><code>          T         X
 1 0.6038558 0.7992435
 2 0.7565791 1.4441495
@@ -125,33 +125,33 @@
 6 1.6720669 1.3225104</code></pre>
 <p>The above codes generate random sample of points <span class="math inline">\((T, X)\)</span> from the bivariate Weibull distribution with the Kendall’s tau (<span class="math inline">\(\tau\)</span>) of 0.5. The pairs <span class="math inline">\((T, X)\)</span> are stored in the rows of the data frame <code>dat</code>.</p>
 <p>The consistent estimator of <span class="math inline">\(\tau\)</span> is the U-statistics <span class="math display">\[ \widehat\tau = \frac{1}{\binom{n}{2}} \sum_{i = 1}^{n - 1}\sum_{j = i + 1}^n\mbox{sgn}\{(X_i - X_j)(T_i - T_j)\},\]</span> where <span class="math inline">\(n\)</span> is the sample size, and <span class="math inline">\(\mbox{sgn}(u)\)</span> is the sign of <span class="math inline">\(u\)</span>, e.g., <span class="citation">Schucany (1985)</span>. The estimator, <span class="math inline">\(\widehat\tau\)</span> can be computed with <code>cor</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">cor</a></span>(dat, <span class="dt">method =</span> <span class="st">"kendall"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">cor</a></span>(dat, <span class="dt">method =</span> <span class="st">"kendall"</span>)</code></pre></div>
 <pre><code>          T         X
 T 1.0000000 0.5059304
 X 0.5059304 1.0000000</code></pre>
 <p>The <strong><code>tranSurv</code></strong> package has a faster implementation to compute the Kendall’ tau:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="../reference/kendall.html">kendall</a></span>(dat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/kendall.html">kendall</a></span>(dat)</code></pre></div>
 <pre><code>[1] 0.5059304</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>microbenchmark::<span class="kw">microbenchmark</span>(<span class="kw"><a href="../reference/kendall.html">kendall</a></span>(dat), <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">cor</a></span>(dat, <span class="dt">method =</span> <span class="st">"kendall"</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>microbenchmark<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/microbenchmark/topics/microbenchmark">microbenchmark</a></span>(<span class="kw"><a href="../reference/kendall.html">kendall</a></span>(dat), <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">cor</a></span>(dat, <span class="dt">method =</span> <span class="st">"kendall"</span>))</code></pre></div>
 <pre><code>Unit: milliseconds
-                         expr        min         lq       mean     median
-                 kendall(dat)   6.718674   6.970557   7.370955   7.163226
- cor(dat, method = "kendall") 186.124992 189.782262 197.699363 195.659067
-         uq       max neval cld
-   7.718964  10.07016   100  a 
- 204.224420 235.20212   100   b</code></pre>
+                         expr        min        lq      mean     median
+                 kendall(dat)   8.753816   8.96441  10.20887   9.629006
+ cor(dat, method = "kendall") 274.699690 278.06297 305.53340 300.487028
+        uq       max neval cld
+  10.85673  23.22783   100  a 
+ 333.22581 361.76708   100   b</code></pre>
 </div>
 <div id="conditional-kendalls-tau" class="section level2">
 <h2 class="hasAnchor">
 <a href="#conditional-kendalls-tau" class="anchor"></a>Conditional Kendall’s tau</h2>
 <p>Assume <span class="math inline">\(X\)</span> is (left) truncated by <span class="math inline">\(T\)</span> as in the scenario of left-truncation so that samples with <span class="math inline">\(X &lt; T\)</span> are not observed. We further assume <span class="math inline">\(X\)</span> is subject to independent right-censoring time <span class="math inline">\(C\)</span>, and <span class="math inline">\(Y = \min(X, C)\)</span> and <span class="math inline">\(\Delta = I(X \le C)\)</span> are also observed. The observed data is then iid copies of <span class="math inline">\((Y, T, \Delta)|Y\ge T\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>dat$C &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Exponential">rexp</a></span>(<span class="dv">3000</span>, .<span class="dv">5</span>)
-&gt;<span class="st"> </span>dat$Y &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">pmin</a></span>(dat$C, dat$X)
-&gt;<span class="st"> </span>dat$delta &lt;-<span class="st"> </span><span class="dv">1</span> *<span class="st"> </span>(dat$X &lt;=<span class="st"> </span>dat$C)
-&gt;<span class="st"> </span>dat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/subset">subset</a></span>(dat, Y &gt;=<span class="st"> </span>T)
-&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/dim">dim</a></span>(dat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>dat<span class="op">$</span>C &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Exponential">rexp</a></span>(<span class="dv">3000</span>, <span class="fl">.5</span>)
+<span class="op">&gt;</span><span class="st"> </span>dat<span class="op">$</span>Y &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">pmin</a></span>(dat<span class="op">$</span>C, dat<span class="op">$</span>X)
+<span class="op">&gt;</span><span class="st"> </span>dat<span class="op">$</span>delta &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">*</span><span class="st"> </span>(dat<span class="op">$</span>X <span class="op">&lt;=</span><span class="st"> </span>dat<span class="op">$</span>C)
+<span class="op">&gt;</span><span class="st"> </span>dat &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/subset">subset</a></span>(dat, Y <span class="op">&gt;=</span><span class="st"> </span>T)
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/dim">dim</a></span>(dat)</code></pre></div>
 <pre><code>[1] 1077    5</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(dat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(dat)</code></pre></div>
 <pre><code>           T         X        C         Y delta
 4  1.2090490 1.2835750 9.472833 1.2835750     1
 9  1.0044891 1.2819928 3.109907 1.2819928     1
@@ -159,8 +159,8 @@ X 0.5059304 1.0000000</code></pre>
 18 0.2815466 0.4472697 1.249041 0.4472697     1
 24 1.1539707 1.2730134 1.737876 1.2730134     1
 25 0.9471815 1.2298707 2.570207 1.2298707     1</code></pre>
-<p>The <strong><code>tranSurv</code></strong> package provides three implementations of conditional Kendall’s tau (<span class="math inline">\(\tau_c\)</span>) for left-truncated, right-censored data. These implementations are called with function <code>condKendall</code>, whose arguments are as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/args">args</a></span>(condKendall)</code></pre></div>
+<p>The <strong><code>tranSurv</code></strong> package provides three implementations of conditional Kendall’s tau (<span class="math inline">\(\tau_c\)</span>) for left-truncated, right-censored data. These implementations are called with function <code>cKendall</code>, whose arguments are as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/args">args</a></span>(cKendall)</code></pre></div>
 <pre><code>function (trun, obs, delta = NULL, method = "MB", weights = NULL, 
     a = 0, trans = "linear", ...) 
 NULL</code></pre>
@@ -170,7 +170,7 @@ NULL</code></pre>
 <li>
 <code>obs</code> observed failure time. Must be the same length as <code>trun</code>, and might be right-censored.</li>
 <li>
-<code>delta</code> an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for <code>obs</code>. If this vector is not specified, <code>condKendall</code> assumes all observed failure times are events.</li>
+<code>delta</code> an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for <code>obs</code>. If this vector is not specified, <code>cKendall</code> assumes all observed failure times are events.</li>
 <li>
 <code>method</code> a character string specifying the different version of conditional Kendall’s tau to be computed. The possible methods are:
 <ul>
@@ -205,30 +205,30 @@ NULL</code></pre>
 <h4 class="hasAnchor">
 <a href="#martin2005testing" class="anchor"></a><span class="citation">Martin and Betensky (2005)</span>
 </h4>
-<p><span class="citation">Tsai (1990)</span> and <span class="citation">Martin and Betensky (2005)</span> consider the consistent estimator: <span class="math display">\[\widetilde\tau_c = \frac{1}{M}\sum_{i = 1}^{n - 1}\sum_{j = i + 1}^n \mbox{sgn}\{(Y_i - Y_j)(T_i - T_j)\}I(\Lambda_{ij}),\]</span> where <span class="math inline">\(\Lambda_{ij} = \{\max(T_i, T_j)\le \min(Y_i, Y_j)\}\cap \{\Delta_{ij}^{(1)}=1\}\)</span>, <span class="math inline">\(\Delta_{ij}^{(1)} = 1\)</span> if <span class="math inline">\(\min{Y_i, Y_j}\)</span> is not a censored event and 0 otherwise. The notation <span class="math inline">\(\Lambda_{ij}\)</span> ensures <span class="math inline">\(Y_i\)</span> and <span class="math inline">\(Y_j\)</span> are orderable and comparable. The corresponding quasi-independence test can be called with the function <code>condKendall</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="../reference/condKendall.html">condKendall</a></span>(dat$T, dat$Y, dat$delta)</code></pre></div>
+<p><span class="citation">Tsai (1990)</span> and <span class="citation">Martin and Betensky (2005)</span> consider the consistent estimator: <span class="math display">\[\widetilde\tau_c = \frac{1}{M}\sum_{i = 1}^{n - 1}\sum_{j = i + 1}^n \mbox{sgn}\{(Y_i - Y_j)(T_i - T_j)\}I(\Lambda_{ij}),\]</span> where <span class="math inline">\(\Lambda_{ij} = \{\max(T_i, T_j)\le \min(Y_i, Y_j)\}\cap \{\Delta_{ij}^{(1)}=1\}\)</span>, <span class="math inline">\(\Delta_{ij}^{(1)} = 1\)</span> if <span class="math inline">\(\min{Y_i, Y_j}\)</span> is not a censored event and 0 otherwise. The notation <span class="math inline">\(\Lambda_{ij}\)</span> ensures <span class="math inline">\(Y_i\)</span> and <span class="math inline">\(Y_j\)</span> are orderable and comparable. The corresponding quasi-independence test can be called with the function <code>cKendall</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/cKendall.html">cKendall</a></span>(dat<span class="op">$</span>T, dat<span class="op">$</span>Y, dat<span class="op">$</span>delta)</code></pre></div>
 <pre><code>
  Test for quasi-independence with conditional Kendall's tau
 
- Call: condKendall(trun = dat$T, obs = dat$Y, delta = dat$delta)
+ Call: cKendall(trun = dat$T, obs = dat$Y, delta = dat$delta)
 
  Kendall's tau = 0.1627 , SE = 0.0222 , Z = 7.3285 , p-value =  0 </code></pre>
 <p>where the asymptotic variance is computed using the asymptotic U-statistic variance outlined in Section 6 of <span class="citation">Martin and Betensky (2005)</span>. The conditional Kendall’s tau value and the corresponding <span class="math inline">\(p\)</span>-value can be called individually:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="../reference/condKendall.html">condKendall</a></span>(dat$T, dat$Y, dat$delta)$PE</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/cKendall.html">cKendall</a></span>(dat<span class="op">$</span>T, dat<span class="op">$</span>Y, dat<span class="op">$</span>delta)<span class="op">$</span>PE</code></pre></div>
 <pre><code>[1] 0.1626586</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="../reference/condKendall.html">condKendall</a></span>(dat$T, dat$Y, dat$delta)$p.value</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/cKendall.html">cKendall</a></span>(dat<span class="op">$</span>T, dat<span class="op">$</span>Y, dat<span class="op">$</span>delta)<span class="op">$</span>p.value</code></pre></div>
 <pre><code>[1] 2.327027e-13</code></pre>
 </div>
 <div id="austin2014eliminating" class="section level4">
 <h4 class="hasAnchor">
 <a href="#austin2014eliminating" class="anchor"></a><span class="citation">Austin and Betensky (2014)</span>
 </h4>
-<p><span class="citation">Austin and Betensky (2014)</span> proposed an inverse probability weighted versions of the conditional Kendall’s tau estimator. When <code>method = "IPW1"</code>, <code>condKendall</code> compute the conditional Kendall’s tau defined as <span class="math inline">\(\widehat\tau_{c2}\)</span> in Section 4 of <span class="citation">Austin and Betensky (2014)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="../reference/condKendall.html">condKendall</a></span>(dat$T, dat$Y, dat$delta, <span class="dt">method =</span> <span class="st">"IPW1"</span>)</code></pre></div>
+<p><span class="citation">Austin and Betensky (2014)</span> proposed an inverse probability weighted versions of the conditional Kendall’s tau estimator. When <code>method = "IPW1"</code>, <code>cKendall</code> compute the conditional Kendall’s tau defined as <span class="math inline">\(\widehat\tau_{c2}\)</span> in Section 4 of <span class="citation">Austin and Betensky (2014)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/cKendall.html">cKendall</a></span>(dat<span class="op">$</span>T, dat<span class="op">$</span>Y, dat<span class="op">$</span>delta, <span class="dt">method =</span> <span class="st">"IPW1"</span>)</code></pre></div>
 <pre><code>
  Test for quasi-independence with conditional Kendall's tau
 
- Call: condKendall(trun = dat$T, obs = dat$Y, delta = dat$delta, method = "IPW1")
+ Call: cKendall(trun = dat$T, obs = dat$Y, delta = dat$delta, method = "IPW1")
 
  Kendall's tau = 0.1653 , SE = 0.022 , Z = 7.51 , p-value =  0 </code></pre>
 </div>
@@ -236,12 +236,12 @@ NULL</code></pre>
 <h4 class="hasAnchor">
 <a href="#austin2014eliminating-1" class="anchor"></a><span class="citation">Austin and Betensky (2014)</span>
 </h4>
-<p>When <code>method = "IPW2"</code>, <code>condKendall</code> compute the conditional Kendall’s tau defined as <span class="math inline">\(\widehat\tau_{c3}\)</span> in Section 4 of <span class="citation">Austin and Betensky (2014)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="../reference/condKendall.html">condKendall</a></span>(dat$T, dat$Y, dat$delta, <span class="dt">method =</span> <span class="st">"IPW2"</span>)</code></pre></div>
+<p>When <code>method = "IPW2"</code>, <code>cKendall</code> compute the conditional Kendall’s tau defined as <span class="math inline">\(\widehat\tau_{c3}\)</span> in Section 4 of <span class="citation">Austin and Betensky (2014)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/cKendall.html">cKendall</a></span>(dat<span class="op">$</span>T, dat<span class="op">$</span>Y, dat<span class="op">$</span>delta, <span class="dt">method =</span> <span class="st">"IPW2"</span>)</code></pre></div>
 <pre><code>
  Test for quasi-independence with conditional Kendall's tau
 
- Call: condKendall(trun = dat$T, obs = dat$Y, delta = dat$delta, method = "IPW2")
+ Call: cKendall(trun = dat$T, obs = dat$Y, delta = dat$delta, method = "IPW2")
 
  Kendall's tau = 0.1713 , SE = 0.0229 , Z = 7.4867 , p-value =  0 </code></pre>
 </div>
@@ -249,33 +249,33 @@ NULL</code></pre>
 <div id="channing-house-study" class="section level2">
 <h2 class="hasAnchor">
 <a href="#channing-house-study" class="anchor"></a>Channing House study</h2>
-<p>We illustrate the use of <code>condKendall</code> on the Channing House data set, which consists of 96 male retirees from their entry to the Channing House retirement community. The data can be prepared with the following codes.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(channing, <span class="dt">package =</span> <span class="st">"boot"</span>)
-&gt;<span class="st"> </span>chan &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/subset">subset</a></span>(channing, sex ==<span class="st"> "Male"</span> &amp;<span class="st"> </span>exit &gt;<span class="st"> </span>entry)</code></pre></div>
+<p>We illustrate the use of <code>cKendall</code> on the Channing House data set, which consists of 96 male retirees from their entry to the Channing House retirement community. The data can be prepared with the following codes.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(channing, <span class="dt">package =</span> <span class="st">"boot"</span>)
+<span class="op">&gt;</span><span class="st"> </span>chan &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/subset">subset</a></span>(channing, sex <span class="op">==</span><span class="st"> "Male"</span> <span class="op">&amp;</span><span class="st"> </span>exit <span class="op">&gt;</span><span class="st"> </span>entry)</code></pre></div>
 <p>The conditional Kendall’s tau values and the associated <span class="math inline">\(p\)</span>-value with the different methods are:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attach">attach</a></span>(chan)
-&gt;<span class="st"> </span><span class="kw"><a href="../reference/condKendall.html">condKendall</a></span>(entry, exit, cens)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/attach">attach</a></span>(chan)
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/cKendall.html">cKendall</a></span>(entry, exit, cens)</code></pre></div>
 <pre><code>
  Test for quasi-independence with conditional Kendall's tau
 
- Call: condKendall(trun = entry, obs = exit, delta = cens)
+ Call: cKendall(trun = entry, obs = exit, delta = cens)
 
  Kendall's tau = 0.1967 , SE = 0.0958 , Z = 2.0529 , p-value =  0.0401 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="../reference/condKendall.html">condKendall</a></span>(entry, exit, cens, <span class="dt">method =</span> <span class="st">"IPW1"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/cKendall.html">cKendall</a></span>(entry, exit, cens, <span class="dt">method =</span> <span class="st">"IPW1"</span>)</code></pre></div>
 <pre><code>
  Test for quasi-independence with conditional Kendall's tau
 
- Call: condKendall(trun = entry, obs = exit, delta = cens, method = "IPW1")
+ Call: cKendall(trun = entry, obs = exit, delta = cens, method = "IPW1")
 
  Kendall's tau = 0.1356 , SE = 0.0927 , Z = 1.4631 , p-value =  0.1434 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="../reference/condKendall.html">condKendall</a></span>(entry, exit, cens, <span class="dt">method =</span> <span class="st">"IPW2"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/cKendall.html">cKendall</a></span>(entry, exit, cens, <span class="dt">method =</span> <span class="st">"IPW2"</span>)</code></pre></div>
 <pre><code>
  Test for quasi-independence with conditional Kendall's tau
 
- Call: condKendall(trun = entry, obs = exit, delta = cens, method = "IPW2")
+ Call: cKendall(trun = entry, obs = exit, delta = cens, method = "IPW2")
 
  Kendall's tau = 0.425 , SE = 0.174 , Z = 2.4423 , p-value =  0.0146 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/detach">detach</a></span>(chan)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/detach">detach</a></span>(chan)</code></pre></div>
 <p>The results are similar to these reported in <span class="citation">Austin and Betensky (2014)</span>.</p>
 </div>
 <div id="reference" class="section level2 unnumbered">
@@ -302,12 +302,13 @@ NULL</code></pre>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#loading-package">Loading package</a></li>
-      <li><a href="#unconditional-kendalls-tau">(Unconditional) Kendall’s tau</a></li>
+      <li><a href="#unconditional-kendalls-tau">Unconditional Kendall’s tau</a></li>
       <li><a href="#conditional-kendalls-tau">Conditional Kendall’s tau</a></li>
       <li><a href="#channing-house-study">Channing House study</a></li>
       <li><a href="#reference">Reference</a></li>

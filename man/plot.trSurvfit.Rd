@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{an object of class \code{trSurvfit} returned by the \code{trSurvfit()} or the \code{trReg()} function.}
+
+\item{...}{graphical parameters to be passed to methods.}
 }
 \value{
 A \code{ggplot} object.
