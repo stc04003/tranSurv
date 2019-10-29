@@ -1,17 +1,60 @@
-#' Goodness of fit
+#' Goodness of fit based on left-truncated regression model
 #'
-#' @param x an object of class \code{trSurvfit} returned by the \code{trSurvfit()} or the \code{trReg()} function.
-#' @param B a numerical value specifies the bootstrap size.
-#' @param Q a numerical value specifies the number of cupoints.
+#' Provide goodness-of-fit diagnostics for the transformation model.
+#'
+#' The googness of fit assessment of the transformation model focus on the structure of the
+#' transformation model, which has the form:
+#' \deqn{h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),}
+#' where \eqn{T} is the truncation time, \eqn{X} is the observed failure time,
+#' \eqn{U} is the transformed truncation time that is quasi-independent from \eqn{X} and
+#' \eqn{h(\cdot)} is a monotonic transformation function.
+#' With the condition, \eqn{T < X}, assumed to be satisfied,
+#' the structure of the transformation model implies
+#' \deqn{X - T = -(1 + a) E(U) + (1 + a) X - (1 + a) \times [U - E(U)] := \beta_0 + \beta_1X + \epsilon.}
+#' 
+#' 
+#' @param x an object of class \code{trSurvfit} returned by the
+#' \code{trSurvfit()} or the \code{trReg()} function.
+#' @param B a integer value specifies the bootstrap size.
+#' @param Q a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.
 #' 
 #' @export
 #' @example inst/examples/ex_gof.R
-#' 
-gof.trReg <- function(x, B = 200,Q) {
-    B <- max(x$B, B)
-    ti <- seq(min(x$.data$stop), max(x$.data$stop), length.out = Q)[-c(1, Q)]
-    ltfit <- getTL(x$.data$start, x$.data$stop, ti, B)
-
+#'
+#' @return A list containing the following elements
+#' \describe{
+#'   \item{coefficients}{the regression coefficients of the left-truncated regression model.}
+#'   \item{pval}{the p-value for testing if all the null hypothesis that all regression coefficients are zero.}
+#' }
+gof <- function(x, B = 200, Q = 1) {
+    B <- max(x$B, B, 2)
+    Q <- max(x$Q, 1)
+    ti <- seq(min(x$.data$stop), max(x$.data$stop), length.out = Q)
+    out <- getTL(x$.data$start, x$.data$stop, ti[-c(1, Q)], B)
+    out$breaks <- ti
+    out$fitQs <- lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
+        tmp <- trReg(Surv(start, stop, status) ~., data = d, method = x$method)
+        tmp$.data$trans <- with(tmp$.data, x$tFun(stop, start, tmp$a))
+        return(tmp)
+    })
+    out$dat.gof <- do.call(rbind, lapply(out$fitQs, function(xx) xx$.data))
+    sc <- survfit(Surv(trans, stop, 1 - status) ~ 1, data = out$dat.gof)
+    wgtX <- approx(sc$time, sc$surv, out$dat.gof$stop[out$dat.gof$status > 0], 
+                   "constant", yleft = 1, yright = min(sc$surv))$y
+    if (x$method == "adjust") {
+        tq <- quantile(out$dat.gof$trans, 0:(1 + Q) / (1 + Q))
+        tmp <- model.matrix( ~ cut(out$dat.gof$trans, breaks = tq,
+                                   include.lowest = TRUE) - 1)
+        nn <- NULL
+        tq <- round(tq, 4)
+        for (i in 1:(Q + 1)) nn[i] <- paste("T in [", tq[i], ", ", tq[i + 1], "]", sep = "")
+        colnames(tmp) <- nn
+        out$dat.gof <- cbind(out$dat.gof, tmp[,1])
+    }
+    out$fit.all <- coxph(Surv(trans, stop, status) ~ .,
+                         data = subset(out$dat.gof, status > 0, select = -start),
+                         weights = 1 / wgtX)
+    return(out)
     ## print p-values
     ## combine all subsets
 }
@@ -22,6 +65,8 @@ gof.trReg <- function(x, B = 200,Q) {
 #' @param yy is the observed survival times (events only)
 #' @param ti is the endpoints of grids
 #' @param B is the bootstrap size
+#'
+#' @noRd
 getTL <- function(tt, yy, ti, B) {
     dat <- NULL
     dat$tt <- tt
@@ -37,18 +82,20 @@ getTL <- function(tt, yy, ti, B) {
             covr[,i] <- pmin(pmax(dat$yy - ti[i - 1], 0), ti[i] - ti[i - 1])
     } else covr[,2] <- pmax(dat$yy - ti[1], 0)
     colnames(covr) <- c(sapply(1:(nCpt + 1), function(x) paste("t", x, sep = "")))                  
-    fit <- lt(xt ~ covr, data = dat, covar = TRUE, B = B)
+    fit <- lt(xt ~ covr, data = dat, covar = TRUE, R = B)
     perm <- combn(length(fit$coefficients[-1]), 2)
     con <- matrix(0, ncol = ncol(perm), nrow = length(fit$coefficients[-1]))
+    ## overall significance
     for (i in 1:ncol(perm)) {
         con[perm[1,i], i] <- 1
         con[perm[2,i], i] <- -1
     }     
     dif.vet <- t(con) %*% fit$coefficients[-1]
     dif.cov <- (t(con) %*% fit$covariance[-1, -1]) %*% con
-    if (qr(dif.cov)$rank < nrow(dif.cov)) {
-        dif.cov <- dif.cov[1:qr(dif.cov)$rank, 1:qr(dif.cov)$rank]
-        dif.vet <- dif.vet[1:qr(dif.cov)$rank]
+    k <- qr(dif.cov)$rank    
+    if (k < nrow(dif.cov)) {
+        dif.cov <- dif.cov[1:k, 1:k]
+        dif.vet <- dif.vet[1:k]
     }
     coefficients <- fit$coefficients
     pval <- 1 - pchisq((t(dif.vet) %*% solve(dif.cov)) %*% dif.vet, length(dif.vet))

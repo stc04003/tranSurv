@@ -6,7 +6,7 @@
 #' documentation on \code{Surv}.
 #'
 #' @importFrom survival Surv
-#' @name export_Surv
+#' @name Surv
 #' @aliases Surv
 #' @export Surv
 NULL

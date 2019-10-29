@@ -38,19 +38,21 @@
 #' 
 #' @return The output contains the following components:
 #' \describe{
-#'   \item{surv}{is a \code{data.frame} contains the survival probabilities estimates.}
-#'   \item{byTau}{a list contains the estimator of transformation parameter:
+#'   \item{\code{surv}}{is a \code{data.frame} contains the survival probabilities estimates.}
+#'   \item{\code{byTau}}{a list contains the estimator of transformation parameter:
 #'     \describe{
 #'     \item{\code{par}}{is the best set of transformation parameter found;}
-#'     \item{\code{obj}}{is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}} 
-#'   \item{byP}{a list contains the estimator of transformation parameter:
-#'     \describe{
-#'     \item{\code{par}}{is the best set of transformation parameter found;
 #'     \item{\code{obj}}{is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}}
-#'   \item{qind}{a data frame consists of two quasi-independent variables:
+#'   }
+#'   \item{\code{byP}}{a list contains the estimator of transformation parameter:
+#'     \describe{
+#'     \item{\code{par}}{is the best set of transformation parameter found;}
+#'     \item{\code{obj}}{is the value of the inverse probability weighted Kendall's tau corresponding to 'par'.}}
+#'   }
+#'   \item{\code{qind}}{a data frame consists of two quasi-independent variables:
 #'     \describe{
 #'     \item{\code{trun}}{ is the transformed truncation time;}
-#'     \item{\code{obs}}{ is the corresponding uncensored failure time.}}
+#'     \item{\code{obs}}{ is the corresponding uncensored failure time.}}}
 #' }
 #'
 #' @references Martin E. and Betensky R. A. (2005), Testing quasi-independence of failure and truncation times via conditional Kendall's tau,

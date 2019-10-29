@@ -194,14 +194,14 @@ trReg <- function(formula, data, subset, tFun = "linear",
     } else {
         engine@tFun <- match.fun(tFun)
     }
-    vNames <- attr(terms(formula), "term.labels")
     if (missing(data)) {
         resp <- eval(formula[[2]], parent.frame())
         covM <- model.matrix(formula, parent.frame())
     } else {
         resp <- eval(formula[[2]], data)
         covM <- model.matrix(formula, data)
-    }   
+    }
+    vNames <- setdiff(colnames(covM), "(Intercept)") # attr(terms(formula), "term.labels")
     if (!is.Surv(resp)) stop("Response must be a Surv resect")
     if (!match("start", attr(resp, "dimnames")[[2]])) stop("Missing left-truncation time")
     engine@lower <- ifelse(engine@lower == -Inf,  -.Machine$integer.max, engine@lower)
@@ -220,6 +220,8 @@ trReg <- function(formula, data, subset, tFun = "linear",
     }
     out$Call <- Call
     out$B <- B
+    out$Q <- engine@Q
+    out$tFun <- engine@tFun
     out$vNames <- vNames
     out$method <- method
     out$.data <- DF 

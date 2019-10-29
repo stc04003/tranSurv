@@ -48,3 +48,11 @@ print.trReg <- function(x, ...) {
     printCoefmat(as.data.frame(tab), P.values = TRUE, has.Pvalue = TRUE)
     cat("\n Transformation parameter is", x$a, "\n")
 }
+
+#' @export
+print.gof <- function(x, ...) {
+    cat("\nOverall signficances based on left-truncated regression model is p-value =", round(x$pval))
+    cat("\nTransformation model based on ", x$Q, "segements:")
+    print(round(coef(summary(x$fit.all)), 4))
+    cat("\n")
+}
