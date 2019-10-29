@@ -8,7 +8,8 @@
 #' \emph{Journal of the American Statistical Association}, \bold{100} (470): 484-492.
 #' @references Austin, M. D. and Betensky R. A. (2014), Eliminating bias due to censoring in Kendall's tau estimators for quasi-independence of truncation and failure,
 #' \emph{Computational Statistics & Data Analysis}, \bold{73}: 16-26.
-#' @references Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2016), Transformation model estimation of survival under dependent truncation and independent censoring, an unpublished manuscript.
+#' @references Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2016), Transformation model estimation of survival under dependent truncation and independent censoring,
+#' \emph{Statistical Methods in Medical Research}, \bold{28} (12): 3785-3798.
 #'
 #' @importFrom survival Surv survfit
 #' @importFrom SQUAREM squarem

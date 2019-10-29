@@ -1,12 +1,11 @@
 #' Weighted conditional Kendall's tau
 #'
-#' This is a temporary function, could be merged into the main function \code{condKendall}.
-#' Give conditional Kendall's tau with the ability to take on perturbation weights.
+#' This is function computes the perturbed version of the conditional Kendall's tau.
 #'
 #' @param trun left truncation time satisfying \code{trun} <= \code{obs}.
 #' @param obs observed failure time, must be the same length as \code{trun}, might be right-censored.
 #' @param delta an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for \code{obs}.
-#' If this vector is not specified, \code{condKendall} assumes no censoring and all observed failure time
+#' If this vector is not specified, \code{cKendall} assumes no censoring and all observed failure time
 #' denote events.
 #' @param weights an optional perturbation weights.
 #' 
@@ -20,3 +19,4 @@ wKendall <- function(trun, obs, delta = NULL, weights = NULL) {
        as.double(delta), as.double(weights),
        out = double(1), PACKAGE = "tranSurv")$out
 }
+2

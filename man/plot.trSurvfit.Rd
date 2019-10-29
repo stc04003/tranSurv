@@ -4,7 +4,7 @@
 \alias{plot.trSurvfit}
 \title{Plot the survival estimation based on the structural transformation model}
 \usage{
-\method{plot}{trSurvfit}(x)
+\method{plot}{trSurvfit}(x, ...)
 }
 \arguments{
 \item{x}{an object of class \code{trSurvfit} returned by the \code{trSurvfit()} or the \code{trReg()} function.}
@@ -13,7 +13,7 @@
 A \code{ggplot} object.
 }
 \description{
-Plot the survival estimation for an \code{trSurvfit} object.
+Plot the survival estimation for an \code{trSurvfit}/\code{trReg} object.
 }
 \examples{
 data(channing, package = "boot")

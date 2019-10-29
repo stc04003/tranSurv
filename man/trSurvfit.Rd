@@ -13,7 +13,7 @@ trSurvfit(trun, obs, delta = NULL, tFun = "linear", plots = FALSE,
 \item{obs}{observed failure time, must be the same length as \code{trun}, might be right-censored.}
 
 \item{delta}{an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for \code{obs}.
-If this vector is not specified, \code{condKendall} assumes no censoring and all observed failure time
+If this vector is not specified, \code{cKendall} assumes no censoring and all observed failure time
 denote events.}
 
 \item{tFun}{a character string specifying the transformation function or a user specified function indicating the relationship

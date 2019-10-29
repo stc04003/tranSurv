@@ -22,7 +22,7 @@
 #' @param trun left truncation time satisfying \code{trun} <= \code{obs}.
 #' @param obs observed failure time, must be the same length as \code{trun}, might be right-censored.
 #' @param delta an optional 0-1 vector of censoring indicator (0 = censored, 1 = event) for \code{obs}.
-#' If this vector is not specified, \code{condKendall} assumes no censoring and all observed failure time
+#' If this vector is not specified, \code{cKendall} assumes no censoring and all observed failure time
 #' denote events.
 #' @param tFun a character string specifying the transformation function or a user specified function indicating the relationship
 #' between \eqn{X}, \eqn{T}, and \eqn{a}.
@@ -81,8 +81,8 @@ trSurvfit <- function(trun, obs, delta = NULL, tFun = "linear", plots = FALSE,
     }
     lower <- ifelse(control$lower == -Inf, -.Machine$integer.max, control$lower)
     upper <- ifelse(control$upper == Inf, .Machine$integer.max, control$upper)
-    ini <- condKendall(trun, obs, delta)
-    ini.ipw <- condKendall(trun, obs, delta, method = "IPW2")    
+    ini <- cKendall(trun, obs, delta)
+    ini.ipw <- cKendall(trun, obs, delta, method = "IPW2")    
     sc <- survfit(Surv(trun, obs, 1 - delta) ~ 1)
     S0 <- survfit(Surv(trun, obs, delta) ~ 1) 
     if (length(table(delta)) > 1 & 
@@ -222,6 +222,8 @@ trSurvfit <- function(trun, obs, delta = NULL, tFun = "linear", plots = FALSE,
     out$iniKendall.ipw <- ini.ipw$PE
     out$iniP <- ini$p.value
     out$iniP.ipw <- ini.ipw$p.value
+    out$tFun <- FUN
+    out$.data <- data.frame(start = trun, stop = obs, status = delta)
     class(out) <- "trSurvfit"
     out
 }
@@ -245,12 +247,12 @@ getA <- function(a, trun, obs, delta = NULL, sc = NULL, FUN, test = "CK") {
     FUN <- match.fun(FUN)
     ta <- mapply(FUN, X = obs, T = trun, a = a)
     if (is.null(sc)) {
-        if (test == "CK") tmp <- condKendall(ta, obs, delta)
+        if (test == "CK") tmp <- cKendall(ta, obs, delta)
         if (test == "PC") tmp <- pmcc(ta[delta == 1], obs[delta == 1])
      } else {
         weights <- approx(sc$time, sc$surv, method = "constant", xout = c(ta, obs),
                           yleft = 1, yright = min(sc$surv))$y
-        tmp <- condKendall(ta, obs, delta, method = "IPW2", weights = weights)
+        tmp <- cKendall(ta, obs, delta, method = "IPW2", weights = weights)
     }
     return(list(PE = tmp$PE, p.value = tmp$p.value))
 }

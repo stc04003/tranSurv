@@ -11,22 +11,15 @@ chan <- subset(channing, entry < exit)
 trReg(Surv(entry, exit, cens) ~ sex, data = chan)
 trReg(Surv(entry, exit, cens) ~ sex, data = chan, method = "adjust", control = list(G = 10))
 
-
-trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 50)
-
-fit <- trReg(Surv(entry, exit, cens) ~ 1, data = chan)
+(fit <- trReg(Surv(entry, exit, cens) ~ 1, data = chan))
 plot(fit)
-
 
 (fit <- with(chan, trSurvfit(entry, exit, cens)))
 plot(fit)
 
-fit0 <- with(chan, trSurvfit(entry, exit, cens))
-str(fit0)
+(fit0 <- with(chan, trSurvfit(entry, exit, cens)))
+gof(fit0, B = 20)
 
 
-
-fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan)
-str(fit)
-
-gof(fit)
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10))
+gof(fit, B = 20)

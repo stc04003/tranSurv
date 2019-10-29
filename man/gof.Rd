@@ -18,7 +18,7 @@ gof(x, B = 200, Q = 1)
 A list containing the following elements
 \describe{
   \item{coefficients}{the regression coefficients of the left-truncated regression model.}
-  \item{pval}{the p-value for testing if all the null hypothesis that all regression coefficients are zero.}
+  \item{pval}{the p-value for the equality of the piecewise linearity terms in the expanded model. See \bold{Details}.}
 }
 }
 \description{
@@ -34,8 +34,17 @@ where \eqn{T} is the truncation time, \eqn{X} is the observed failure time,
 With the condition, \eqn{T < X}, assumed to be satisfied,
 the structure of the transformation model implies
 \deqn{X - T = -(1 + a) E(U) + (1 + a) X - (1 + a) \times [U - E(U)] := \beta_0 + \beta_1X + \epsilon.}
+The regression estimates can be obtained by the left-truncated regression model (Karlsson and Lindmark, 2014).
+To evaluate the goodness of fit of the transformation model,
+the \code{gof()} function directly test the inearity in \eqn{X} by considering larger model that are nonlinear in \eqn{X}.
+In particular, we expand the covariates \eqn{X} to \code{Q} piecewise linearity terms and test for equality of the associated coefficients.
 }
 \examples{
 data(channing, package = "boot")
 chan <- subset(channing, entry < exit)
+fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan)
+gof(fit, B = 25)
+}
+\references{
+Karlsson, M., Lindmark, A. (2014) truncSP: An R Package for Estimation of Semi-Parametric Truncated Linear Regression Models, \emph{Journal of Statistical Software}, \bold{57} (14), pp 1--19.
 }
