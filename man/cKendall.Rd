@@ -19,9 +19,9 @@ denote events.}
 \item{method}{a character string specifying the different version of conditional Kendall's tau to be computed.
 The following are permitted:
 \describe{
-  \item{\code{MB}}{conditional Kendall's tau proposed in Martin and Betensky (2005) as \eqn{\hat{\tau_c},}}
-  \item{\code{IPW1}}{inverse probability weighted estimator proposed in Austin and Betensky (2014) as \eqn{\hat{\tau_{c2}},}}
-  \item{\code{IPW2}}{restricted inverse probability weighted estimator proposed in Austin and Betensky (2014) as \eqn{\hat{\tau_{c3}}.}}
+  \item{\code{MB}}{conditional Kendall's tau proposed in Martin and Betensky (2005) as \eqn{\hat{\tau}_c,}}
+  \item{\code{IPW1}}{inverse probability weighted estimator proposed in Austin and Betensky (2014) as \eqn{\hat{\tau}_{c2},}}
+  \item{\code{IPW2}}{restricted inverse probability weighted estimator proposed in Austin and Betensky (2014) as \eqn{\hat{\tau}_{c3}.}}
 }}
 
 \item{weights}{an optional vector of sampling weights used when \code{method = IPW1} or \code{method = IPW2}.

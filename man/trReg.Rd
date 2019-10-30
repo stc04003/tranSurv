@@ -13,12 +13,12 @@ The \code{response} is assumed to be a \code{survival::Surv} object with both le
 When there is no covariates, e.g., when the right hand side of the formula is \code{~ 1}, the \code{trReg()} function returns a \code{trSurvfit} object.
 See \code{?survival::Surv} for more details.}
 
-\item{data}{an optional data.frame in which to interpret the variables occurring
+\item{data}{an optional data frame in which to interpret the variables occurring
 in the \code{formula}.}
 
 \item{subset}{an optional vector specifying a subset of observations to be used in the fitting process.}
 
-\item{tFun}{a character string specifying the transformation function or a user specified function indicating the relationship between X, T, and a.
+\item{tFun}{a character string specifying the transformation function or a user specified function indicating the relationship between \eqn{X}, \eqn{T}, and \eqn{a}.
 When \code{tFun} is a character, the following are permitted:
 \describe{
   \item{linear}{linear transformation structure,}
@@ -39,7 +39,7 @@ When \code{B = 0} (default), the bootstrap standard errors will not be computed.
   \item{\code{G}}{The number of grids used in the search for the transformation parameter; default is 50.
 A smaller \code{G} could results in faster search, but might be inaccurate.}
   \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}. The default is 0.}
-  \item{\code{parallel}}{an logical value indicating whether parallel computation will be applied when \code{B} is not 0.}
+  \item{\code{parallel}}{an logical value indicating whether parallel computation will be applied when \code{B > 0}.}
   \item{\code{parCl}}{an integer value specifying the number of CPU cores to be used when \code{parallel = TRUE}.
 The default value is half the CPU cores on the current host.}
 }}
@@ -60,7 +60,7 @@ The quasi-independent truncation time, \eqn{U}, is obtained by inverting the tes
   \item{\code{method = "kendall"}}{ by minimizing the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \eqn{p}-value.
 This is the same procedure used in the \code{trSUrvfit()} function.}
   \item{\code{method = "adjust"}}{ includes a function of latent truncation time, \eqn{U}, as a covariate.
-  A piece-wise function is constructed based on \code{Q+1} indicator functions on whether \eqn{U} falls in the \eqn{Q}th and the (\eqn{Q+1})th percentile,
+  A piece-wise function is constructed based on (\eqn{Q + 1}) indicator functions on whether \eqn{U} falls in the \eqn{Q}th and the (\eqn{Q+1})th percentile,
   where \eqn{Q} is the number of cutpoints used. See \code{control} for details. 
   The transformation parameter, \eqn{a}, is then chosen to minimize the significance of the coefficient parameter.}}
 }
