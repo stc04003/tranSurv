@@ -48,6 +48,8 @@ trFit.adjust <- function(DF, engine, stdErr) {
     trun1 <- trun[delta == 1]
     obs1 <- obs[delta == 1]
     delta1 <- delta[delta == 1]
+    if (min(sc$surv) == 0) 
+        sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
     wgtX <- approx(sc$time, sc$surv, obs1, "constant", yleft = 1, yright = min(sc$surv))$y
     coxAj <- function(a) {
         ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
@@ -84,11 +86,16 @@ trFit.boot <- function(DF, engine, stdErr) {
     obs <- DF$stop
     delta <- DF$status
     out <- trFit(DF, engine, NULL)
+    win <- (engine@upper - engine@lower) / engine@G
+    engine@lower <- max(engine@lower, out$a - win)
+    engine@upper <- min(engine@upper, out$a + win)
+    engine@G <- max(5, round(engine@G / 10))
     if (stdErr@parallel) {
         cl <- makeCluster(stdErr@parCl)
         clusterExport(cl = cl,
                       varlist = c("DF", "engine"), envir = environment())
-        out$SE <- parSapply(cl, 1:stdErr@B, function(x) trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
+        out$SE <- parSapply(cl, 1:stdErr@B, function(x)
+            trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
         stopCluster(cl)
     } else out$SE <- replicate(stdErr@B,
                                trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
@@ -101,7 +108,8 @@ trFit.boot <- function(DF, engine, stdErr) {
 #' @noRd
 #' @keywords internal
 setClass("Engine",
-         representation(tol = "numeric", lower = "numeric", upper = "numeric", G = "numeric", Q = "numeric", tFun = "function"),
+         representation(tol = "numeric", lower = "numeric", upper = "numeric",
+                        G = "numeric", Q = "numeric", tFun = "function"),
          prototype(tol = 1e-2, lower = -1, upper = 20, G = 50, Q = 0),
          contains= "VIRTUAL")
 setClass("kendall", contains = "Engine")
