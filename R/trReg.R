@@ -22,8 +22,12 @@ trFit.kendall <- function(DF, engine, stdErr) {
                  tol = engine@tol, interval = c(grids[y], grids[y + 1])))
     a <- as.numeric(tmp[1, which.min(tmp[2,])])
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
+    ## guard against infity weights
+    if (min(sc$surv) == 0) 
+        sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
     wgtX <- approx(sc$time, sc$surv, obs1, "constant", yleft = 1, yright = min(sc$surv))$y
-    out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]), weights = 1 / wgtX)))    
+    out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]),
+                                 weights = 1 / wgtX)))
     ## trun0 <- ifelse(delta == 1, ta[match(obs, obs1)], trun)
     ## out <- coef(summary(coxph(Surv(trun0, obs, delta) ~ DF[,-(1:3)], weights = 1 / wgtX)))
     rownames(out$PE) <- names(DF)[-(1:3)]
@@ -86,7 +90,8 @@ trFit.boot <- function(DF, engine, stdErr) {
                       varlist = c("DF", "engine"), envir = environment())
         out$SE <- parSapply(cl, 1:stdErr@B, function(x) trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
         stopCluster(cl)
-    } else out$SE <- replicate(stdErr@B, trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
+    } else out$SE <- replicate(stdErr@B,
+                               trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
     if (nrow(out$PE) > 1) out$SE <- apply(out$SE, 1, sd)
     else out$SE <- sd(out$SE)
     out

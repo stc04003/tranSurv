@@ -42,14 +42,29 @@ print.trReg <- function(x, ...) {
     print(x$Call)
     cat("\n Sample size =", nrow(x$.data))
     cat("\n Number of events = ", sum(x$.data$status))
-    cat("\n Transformation parameter is", x$a, "\n\n")
-    tab <- cbind(coef = round(x$PE[,1], 3),
-                 "se(coef)" = round(x$SE, 3),
-                 z = round(x$PE[,1] / x$SE, 3),
-                 "Pr(>|z|)" = round(2 * pnorm(-abs(x$PE[,1] / x$SE)), 3))
-    rownames(tab) <- x$varNames
-    printCoefmat(as.data.frame(tab), P.values = TRUE, has.Pvalue = TRUE)
+    cat("\n Transformation parameter is", x$a)
+    cat("\n Standard errors from coxph:\n\n")
+    tab1 <- cbind(coef = round(x$PE[,1], 3),
+                  "se(coef)" = round(x$PE[,3], 3),
+                  z = round(x$PE[,4], 3),
+                  "Pr(>|z|)" = round(x$PE[,5], 3))
+    rownames(tab1) <- x$varNames
+    printCoefmat(as.data.frame(tab1), P.values = TRUE, has.Pvalue = TRUE)
+    if (x$B > 0) {
+        cat("\n Standard errors from bootstrap:\n\n")
+        tab2 <- cbind(coef = round(x$PE[,1], 3),
+                      "se(coef)" = round(x$SE, 3),
+                      z = round(x$PE[,1] / x$SE, 3),
+                      "Pr(>|z|)" = round(2 * pnorm(-abs(x$PE[,1] / x$SE)), 3))
+        rownames(tab2) <- x$varNames
+        printCoefmat(as.data.frame(tab2), P.values = TRUE, has.Pvalue = TRUE)
+    }
     cat("\n")
+}
+
+#' @export
+summary.trReg <- function(x, ...) {
+    print(x)
 }
 
 #' @export
