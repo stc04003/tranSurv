@@ -50,6 +50,9 @@ gof <- function(x, B = 200, Q = 1) {
         })
         out$dat.gof <- do.call(rbind, lapply(out$fitQs, function(xx) xx$.data))
         sc <- survfit(Surv(trans, stop, 1 - status) ~ 1, data = out$dat.gof)
+        ## guard against infity weights
+        if (min(sc$surv) == 0) 
+            sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
         wgtX <- approx(sc$time, sc$surv, out$dat.gof$stop[out$dat.gof$status > 0], 
                        "constant", yleft = 1, yright = min(sc$surv))$y
         if (x$method == "adjust") {
