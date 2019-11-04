@@ -64,7 +64,7 @@ print.trReg <- function(x, ...) {
                  "Pr(>|z|)" = round(2 * pnorm(-abs(x$PE[,1] / x$SE)), 3))
     rownames(tab) <- x$varNames
     printCoefmat(as.data.frame(tab), P.values = TRUE, has.Pvalue = TRUE)
-    cat("\n")
+    cat("\n\n")
 }
 
 #' @export
@@ -81,7 +81,7 @@ print.trgof <- function(x, ...) {
             paste("(", round(x$breaks[i], 3), ", ", round(x$breaks[i + 1], 3), "]", sep = ""), 
             ", the transformation parameter is", unique(x$fitQs[[i]]$a))
     }
-    cat("\n")
+    cat("\n\n")
     ## if (!is.null(x$fit.all)) {
     ##     printCoefmat(round(coef(summary(x$fit.all)), 4), P.values = TRUE, has.Pvalue = TRUE)
     ##     cat("\n")

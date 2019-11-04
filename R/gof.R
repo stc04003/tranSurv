@@ -38,6 +38,7 @@ globalVariables(c("start", "status")) ## global variables for gof()
 gof <- function(x, B = 200, P = 1, Q = 0) {
     B <- max(x$B, B, 2)
     P <- max(x$P, P, 1)
+    Q <- max(x$Q, Q, 2)
     ti <- x$.data$stop[x$.data$status > 0]
     ti <- ti[!(ti %in% boxplot(ti, plot = FALSE)$out)]
     ti <- seq(min(ti), max(ti), length.out = P + 2)
