@@ -32,6 +32,47 @@ trFit.kendall <- function(DF, engine, stdErr) {
     return(out)
 }
 
+
+#' This is like \code{trFit.kendall} but with piece-wise regression
+#'
+#' @noRd
+#' @keywords internal
+trFit.kendall2 <- function(DF, engine, stdErr) {
+    out <- NULL
+    P <- max(engine@P, 1)    
+    ti <- DF$stop[DF$status > 0]
+    ti <- ti[!(ti %in% boxplot(ti, plot = FALSE)$out)]
+    out$breaks <- ti <- seq(min(ti), max(ti), length.out = P + 2)
+    pwReg <- lapply(split(DF, cut(DF$stop, ti)), function(d) {
+        tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[, engine@vNames]),
+                     data = d, method = "kendall", B = 0, tFun = engine@tFun, 
+                     control = list(engine@sc, G = engine@G, Q = engine@Q,
+                                    tol = engine@tol, lower = engine@lower, upper = engine@upper))
+        names(tmp$.data)[-(1:3)] <- engine@vNames
+        tmp$.data$ta <- with(tmp$.data, engine@tFun(stop, start, tmp$a))
+        tmp$.data$a <- tmp$a
+        return(tmp$.data)
+    })
+    DF2 <- do.call(rbind, pwReg)
+    trun <- DF2$start
+    obs <- DF2$stop
+    delta <- DF2$status
+    ## Finding the latent truncation time
+    trun1 <- trun[delta == 1] ## trun[order(obs)][delta[order(obs)] == 1]
+    obs1 <- obs[delta == 1]
+    delta1 <- delta[delta == 1]
+     ta1 <- DF2$ta[delta == 1]
+    wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
+                   yright = min(engine@sc$surv))$y
+    suppressWarnings(out$PE <- coef(summary(coxph(Surv(ta1, obs1, delta1) ~
+                                                      as.matrix(DF2[delta == 1, engine@vNames]),
+                                                  weights = 1 / wgtX))))
+    out$varNames <- rownames(out$PE) <- engine@vNames
+    out$SE <- NA
+    out$a <- unique(DF2$a)
+    return(out)
+}
+
 #' @noRd
 #' @keywords internal
 trFit.adjust <- function(DF, engine, stdErr) {
@@ -74,6 +115,48 @@ trFit.adjust <- function(DF, engine, stdErr) {
     return(out)    
 }
 
+#' @noRd
+#' @keywords internal
+trFit.adjust2 <- function(DF, engine, stdErr) {
+    out <- NULL
+    P <- max(engine@P, 1)    
+    ti <- DF$stop[DF$status > 0]
+    ti <- ti[!(ti %in% boxplot(ti, plot = FALSE)$out)]
+    out$breaks <- ti <- seq(min(ti), max(ti), length.out = P + 2)
+    pwReg <- lapply(split(DF, cut(DF$stop, ti)), function(d) {
+        tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[, engine@vNames]),
+                     data = d, method = "adjust", B = 0, tFun = engine@tFun, 
+                     control = list(engine@sc, G = engine@G, Q = engine@Q,
+                                    tol = engine@tol, lower = engine@lower, upper = engine@upper))
+        names(tmp$.data)[-(1:3)] <- engine@vNames
+        tmp$.data$ta <- with(tmp$.data, engine@tFun(stop, start, tmp$a))
+        tmp$.data$a <- tmp$a
+        return(tmp$.data)
+    })    
+    DF2 <- do.call(rbind, pwReg)
+    trun <- DF2$start
+    obs <- DF2$stop
+    delta <- DF2$status
+    trun1 <- trun[delta == 1]
+    obs1 <- obs[delta == 1]
+    delta1 <- delta[delta == 1]
+    ta1 <- DF2$ta[delta == 1]
+    wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
+                   yright = min(engine@sc$surv))$y
+    if (engine@Q > 0)
+        covs <- model.matrix( ~ cut(ta1, breaks = quantile(ta1, 0:(1 + engine@Q) / (1 + engine@Q)),
+                                   include.lowest = TRUE) - 1)
+    else covs <- ta1
+    suppressWarnings(out$PE <- coef(summary(coxph(Surv(ta1, obs1, delta1) ~
+                                                      as.matrix(DF2[delta == 1,engine@vNames]) + covs,
+                                                  weights = 1 / wgtX))))
+    out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
+    out$varNames <- rownames(out$PE) <- engine@vNames
+    out$SE <- NA
+    out$a <- unique(DF2$a)
+    return(out)    
+}
+
 #' @importFrom parallel makeCluster clusterExport parSapply stopCluster
 #' @noRd
 #' @keywords internal
@@ -112,6 +195,10 @@ setClass("Engine",
 setClass("kendall", contains = "Engine")
 setClass("adjust", contains = "Engine")
 
+## For piecewise
+setClass("kendall2", contains = "Engine") 
+setClass("adjust2", contains = "Engine")
+
 setClass("stdErr",
          representation(B = "numeric", parallel = "logical", parCl = "numeric"),
          prototype(B = 100, parallel = FALSE, parCl = parallel::detectCores() / 2),
@@ -125,8 +212,13 @@ setGeneric("trFit", function(DF, engine, stdErr) {standardGeneric("trFit")})
 
 setMethod("trFit", signature(engine = "kendall", stdErr = "NULL"), trFit.kendall)
 setMethod("trFit", signature(engine = "adjust", stdErr = "NULL"), trFit.adjust)
+setMethod("trFit", signature(engine = "kendall2", stdErr = "NULL"), trFit.kendall2)
+setMethod("trFit", signature(engine = "adjust2", stdErr = "NULL"), trFit.adjust2)
+
 setMethod("trFit", signature(engine = "kendall", stdErr = "bootstrap"), trFit.boot)
 setMethod("trFit", signature(engine = "adjust", stdErr = "bootstrap"), trFit.boot)
+setMethod("trFit", signature(engine = "kendall2", stdErr = "bootstrap"), trFit.boot)
+setMethod("trFit", signature(engine = "adjust2", stdErr = "bootstrap"), trFit.boot)
 
 #' Fitting regression model via structural transformation model
 #'
@@ -191,7 +283,9 @@ trReg <- function(formula, data, subset, tFun = "linear",
     method <- match.arg(method)
     Call <- match.call()
     engine.control <- control[names(control) %in% names(attr(getClass(method), "slots"))]
-    engine <- do.call("new", c(list(Class = method), engine.control))
+    if (max(engine.control$P, 0) > 0)
+        engine <- do.call("new", c(list(Class = paste(method, 2, sep = "")), engine.control))
+    else engine <- do.call("new", c(list(Class = method), engine.control))
     stdErr.control <- control[names(control) %in% names(attr(getClass("bootstrap"), "slots"))]
     stdErr <- do.call("new", c(list(Class = "bootstrap"), stdErr.control))
     stdErr@B <- B
@@ -231,7 +325,7 @@ trReg <- function(formula, data, subset, tFun = "linear",
     } else {
         DF <- as.data.frame(cbind(DF, covM)) ## First 3 columns reserved for `start`, `stop`, `status`
         DF <- DF[,(colnames(DF) != "(Intercept)")]
-        out <- trFit(DF, engine, stdErr)
+        suppressWarnings(out <- trFit(DF, engine, stdErr))
         class(out) <- "trReg"
     }
     out$Call <- Call

@@ -23,3 +23,7 @@ gof(fit0, B = 20)
 
 (fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10))
 gof(fit, B = 20)
+
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10))
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, control = list(P = 2)))
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, control = list(P = 3)))

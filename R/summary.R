@@ -10,6 +10,13 @@ print.cKendall <- function(x, ...) {
 }
 
 #' @export
+coef.trReg <- function(x, ...) {
+    tmp <- x$PE[,1]
+    names(tmp) <- x$vNames
+    return(tmp)
+}
+
+#' @export
 print.pmcc <- function(x, ...) {
     cat("\n Test for quasi-independence with conditional correlation coefficient\n")
     cat("\n Call: ")
@@ -42,8 +49,15 @@ print.trReg <- function(x, ...) {
     print(x$Call)
     cat("\n Sample size =", nrow(x$.data))
     cat("\n Number of events = ", sum(x$.data$status))
-    cat("\n Transformation parameter is", x$a, "\n\n")
-    cat("\n Standard errors obtained from", x$B, "bootstrap samples.\n")
+    if (length(x$a) > 1) {
+        cat("\n\n The segments and the corresponding transformation parameters are:")
+        for (i in 1:length(x$a)) {
+            cat("\n   For segment",
+                paste("(", round(x$breaks[i], 3), ", ", round(x$breaks[i + 1], 3), "]", sep = ""), 
+                ", the transformation parameter is", x$a[i])
+        }
+    } else cat("\n\n Transformation parameter is", x$a, "\n\n")
+    cat("\n\n Standard errors obtained from", x$B, "bootstrap samples.\n")
     tab <- cbind(coef = round(x$PE[,1], 3),
                  "se(coef)" = round(x$SE, 3),
                  z = round(x$PE[,1] / x$SE, 3),

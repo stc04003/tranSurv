@@ -72,7 +72,7 @@ gof <- function(x, B = 200, P = 1, Q = 0) {
         out$fitQs <- lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
             tmp <- with(d, trSurvfit(start, stop, status, tFun = x$tFun))
             tmp$.data$trans <- with(tmp$.data, x$tFun(stop, start, tmp$byTau$par))
-            tmp$.data$a <- tmp$a
+            tmp$.data$a <- tmp$byTau$par
             return(tmp$.data)
         })
         out$dat.gof <- do.call(rbind, out$fitQs)
