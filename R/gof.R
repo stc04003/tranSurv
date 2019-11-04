@@ -63,7 +63,7 @@ gof <- function(x, B = 200, P = 1) {
                                        include.lowest = TRUE) - 1)
             nn <- NULL
             tq <- round(tq, 4)
-            for (i in 1:(Q + 1)) nn[i] <- paste("T in (", tq[i], ", ", tq[i + 1], "]", sep = "")
+            for (i in 1:(Q + 1)) nn[i] <- paste("T'(a) in (", tq[i], ", ", tq[i + 1], "]", sep = "")
             colnames(tmp) <- nn
             out$dat.gof <- cbind(out$dat.gof, tmp) ##[,1])
         }
@@ -78,12 +78,9 @@ gof <- function(x, B = 200, P = 1) {
         })
         out$dat.gof <- do.call(rbind, out$fitQs)
     }
-    colnames(out$dat.gof)[4:length(x$vNames)] <- x$vNames
-    
+    colnames(out$dat.gof)[4:(3 + length(x$vNames))] <- x$vNames
     class(out) <- "trgof"
     return(out)
-    ## print p-values
-    ## combine all subsets
 }
 
 #' @importFrom truncSP lt

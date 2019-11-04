@@ -57,7 +57,7 @@ print.trReg <- function(x, ...) {
                 ", the transformation parameter is", x$a[i])
         }
     } else cat("\n\n Transformation parameter is", x$a, "\n\n")
-    cat("\n\n Standard errors obtained from", x$B, "bootstrap samples.\n")
+    cat("\n Standard errors obtained from", x$B, "bootstrap samples.\n")
     tab <- cbind(coef = round(x$PE[,1], 3),
                  "se(coef)" = round(x$SE, 3),
                  z = round(x$PE[,1] / x$SE, 3),
