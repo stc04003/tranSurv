@@ -56,7 +56,7 @@ print.trReg <- function(x, ...) {
                 paste("(", round(x$breaks[i], 3), ", ", round(x$breaks[i + 1], 3), "]", sep = ""), 
                 ", the transformation parameter is", x$a[i])
         }
-    } else cat("\n\n Transformation parameter is", x$a, "\n\n")
+    } else cat("\n\n Transformation parameter is", x$a, "\n")
     cat("\n Standard errors obtained from", x$B, "bootstrap samples.\n")
     tab <- cbind(coef = round(x$PE[,1], 3),
                  "se(coef)" = round(x$SE, 3),
@@ -64,7 +64,22 @@ print.trReg <- function(x, ...) {
                  "Pr(>|z|)" = round(2 * pnorm(-abs(x$PE[,1] / x$SE)), 3))
     rownames(tab) <- x$varNames
     printCoefmat(as.data.frame(tab), P.values = TRUE, has.Pvalue = TRUE)
-    cat("\n\n")
+    cat("\n")
+    if (!is.null(x$PEta)) {
+        cat("\n Coefficient estimates for transformed truncation times used in the adjusted model:\n")
+        if (is.matrix(x$PEta))
+            tab2 <- cbind(coef = round(x$PEta[,1], 3),
+                          "se(coef)" = round(x$PEta[,3], 3),
+                          z = round(x$PE[,4], 3),
+                          "Pr(>|z|)" = round(x$PE[,5], 3))
+        else tab2 <- data.frame(coef = round(x$PEta[1], 3),
+                          "se(coef)" = round(x$PEta[3], 3),
+                          z = round(x$PE[4], 3),
+                          "Pr(>|z|)" = round(x$PE[5], 3))
+        printCoefmat(as.data.frame(tab2), P.values = TRUE, has.Pvalue = TRUE)
+        cat("\n")
+    }
+    
 }
 
 #' @export

@@ -27,3 +27,13 @@ gof(fit, B = 20)
 (fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10))
 (fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, control = list(P = 2)))
 (fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, control = list(P = 3)))
+
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, method = "adjust"))
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, method = "adjust", control = list(P = 2)))
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, method = "adjust", control = list(P = 3)))
+
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, method = "adjust", control = list(Q = 1)))
+(fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan, B = 10, method = "adjust", control = list(Q = 2)))
+
+names(fit)
+fit$PEta

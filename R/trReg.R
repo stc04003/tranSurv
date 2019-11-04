@@ -101,14 +101,22 @@ trFit.adjust <- function(DF, engine, stdErr) {
         optimize(f = function(x) suppressWarnings(coxAj(x)), interval = c(grids[y], grids[y + 1])))
     a <- as.numeric(tmp[1, which.min(tmp[2,])])
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
-    if (engine@Q > 0)
-        covs <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
-                                   include.lowest = TRUE) - 1)
-    else covs <- ta
+    if (engine@Q > 0) {
+        tq <- quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q))
+        covs <- model.matrix( ~ cut(ta, breaks = tq, include.lowest = TRUE) - 1)
+    } else covs <- ta
     out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~
                                      as.matrix(DF[delta == 1,engine@vNames]) + covs,
                                  weights = 1 / wgtX)))
+    out$PEta <- out$PE[-(1:(length(engine@vNames))),,drop = FALSE]
     out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
+    if (engine@Q > 0) {
+        nn <- NULL
+        tq <- round(tq, 4)
+        for (i in 1:(engine@Q + 1)) nn[i] <- paste("T'(a) in (", tq[i], ", ", tq[i + 1], "]", sep = "")
+        rownames(out$PEta) <- nn
+    } else rownames(out$PEta) <- "T'(a)"
+    out$PEta <- out$PEta[complete.cases(out$PEta),]
     out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
     out$a <- a
@@ -143,14 +151,22 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
     ta1 <- DF2$ta[delta == 1]
     wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
                    yright = min(engine@sc$surv))$y
-    if (engine@Q > 0)
-        covs <- model.matrix( ~ cut(ta1, breaks = quantile(ta1, 0:(1 + engine@Q) / (1 + engine@Q)),
-                                   include.lowest = TRUE) - 1)
-    else covs <- ta1
+    if (engine@Q > 0) {
+        tq <- quantile(ta1, 0:(1 + engine@Q) / (1 + engine@Q))
+        covs <- model.matrix( ~ cut(ta1, breaks = tq, include.lowest = TRUE) - 1)
+    } else covs <- ta1
     suppressWarnings(out$PE <- coef(summary(coxph(Surv(ta1, obs1, delta1) ~
                                                       as.matrix(DF2[delta == 1,engine@vNames]) + covs,
                                                   weights = 1 / wgtX))))
+    out$PEta <- out$PE[-(1:(length(engine@vNames))),,drop = FALSE]
     out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
+    if (engine@Q > 0) {
+        nn <- NULL
+        tq <- round(tq, 4)
+        for (i in 1:(engine@Q + 1)) nn[i] <- paste("T'(a) in (", tq[i], ", ", tq[i + 1], "]", sep = "")
+        rownames(out$PEta) <- nn
+    } else rownames(out$PEta) <- "T'(a)"
+    out$PEta <- out$PEta[complete.cases(out$PEta),]
     out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
     out$a <- unique(DF2$a)
