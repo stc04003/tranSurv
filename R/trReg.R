@@ -126,7 +126,7 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
     pwReg <- lapply(split(DF, cut(DF$stop, ti)), function(d) {
         tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[, engine@vNames]),
                      data = d, method = "adjust", B = 0, tFun = engine@tFun, 
-                     control = list(engine@sc, G = engine@G, Q = engine@Q,
+                     control = list(engine@sc, G = engine@G, Q = engine@Q, P = 0, 
                                     tol = engine@tol, lower = engine@lower, upper = engine@upper))
         names(tmp$.data)[-(1:3)] <- engine@vNames
         tmp$.data$ta <- with(tmp$.data, engine@tFun(stop, start, tmp$a))

@@ -35,10 +35,10 @@ globalVariables(c("start", "status")) ## global variables for gof()
 #'   \item{coefficients}{the regression coefficients of the left-truncated regression model.}
 #'   \item{pval}{the p-value for the equality of the piecewise linearity terms in the expanded model. See \bold{Details}.}
 #' }
-gof <- function(x, B = 200, P = 1, Q = 0) {
+gof <- function(x, B = 200, P = 1) {
     B <- max(x$B, B, 2)
     P <- max(x$P, P, 1)
-    Q <- max(x$Q, Q, 2)
+    Q <- x$Q
     ti <- x$.data$stop[x$.data$status > 0]
     ti <- ti[!(ti %in% boxplot(ti, plot = FALSE)$out)]
     ti <- seq(min(ti), max(ti), length.out = P + 2)
@@ -51,7 +51,7 @@ gof <- function(x, B = 200, P = 1, Q = 0) {
         out$fitQs <- lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
             tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[,x$vNames]), data = d,
                          method = x$method,
-                         control = list(sc = list(time = sc$time, surv = sc$surv)))
+                         control = list(sc = list(time = sc$time, surv = sc$surv), Q = Q))
             tmp$.data$trans <- with(tmp$.data, x$tFun(stop, start, tmp$a))
             tmp$.data$a <- tmp$a
             return(tmp$.data)
@@ -65,7 +65,7 @@ gof <- function(x, B = 200, P = 1, Q = 0) {
             tq <- round(tq, 4)
             for (i in 1:(Q + 1)) nn[i] <- paste("T in (", tq[i], ", ", tq[i + 1], "]", sep = "")
             colnames(tmp) <- nn
-            out$dat.gof <- cbind(out$dat.gof, tmp[,1])
+            out$dat.gof <- cbind(out$dat.gof, tmp) ##[,1])
         }
         out$dat.gof <- subset(out$dat.gof, select = -a)
     }
@@ -78,6 +78,8 @@ gof <- function(x, B = 200, P = 1, Q = 0) {
         })
         out$dat.gof <- do.call(rbind, out$fitQs)
     }
+    colnames(out$dat.gof)[4:length(x$vNames)] <- x$vNames
+    
     class(out) <- "trgof"
     return(out)
     ## print p-values
