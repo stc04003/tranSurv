@@ -2,7 +2,7 @@
 
 S3method(plot,trReg)
 S3method(plot,trSurvfit)
-S3method(print,condKendall)
+S3method(print,cKendall)
 S3method(print,pmcc)
 S3method(print,trReg)
 S3method(print,trSurvfit)

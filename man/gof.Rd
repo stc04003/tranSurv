@@ -4,7 +4,7 @@
 \alias{gof}
 \title{Goodness of fit based on left-truncated regression model}
 \usage{
-gof(x, B = 200, Q = 1)
+gof(x, B = 200, P = 1, Q = 0)
 }
 \arguments{
 \item{x}{an object of class \code{trSurvfit} returned by the
@@ -12,7 +12,7 @@ gof(x, B = 200, Q = 1)
 
 \item{B}{a integer value specifies the bootstrap size.}
 
-\item{Q}{a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.}
+\item{P}{a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.}
 }
 \value{
 A list containing the following elements

@@ -22,7 +22,7 @@ globalVariables(c("start", "status")) ## global variables for gof()
 #' @param x an object of class \code{trSurvfit} returned by the
 #' \code{trSurvfit()} or the \code{trReg()} function.
 #' @param B a integer value specifies the bootstrap size.
-#' @param Q a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.
+#' @param P a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.
 #' 
 #' @export
 #' @example inst/examples/ex_gof.R
@@ -35,52 +35,47 @@ globalVariables(c("start", "status")) ## global variables for gof()
 #'   \item{coefficients}{the regression coefficients of the left-truncated regression model.}
 #'   \item{pval}{the p-value for the equality of the piecewise linearity terms in the expanded model. See \bold{Details}.}
 #' }
-gof <- function(x, B = 200, Q = 1) {
+gof <- function(x, B = 200, P = 1, Q = 0) {
     B <- max(x$B, B, 2)
-    Q <- max(x$Q, Q + 2)
+    P <- max(x$P, P, 1)
+    ti <- x$.data$stop[x$.data$status > 0]
+    ti <- ti[!(ti %in% boxplot(ti, plot = FALSE)$out)]
+    ti <- seq(min(ti), max(ti), length.out = P + 2)
+    out <- getTL(x$.data$start, x$.data$stop, ti[-c(1, P + 2)], B)
+    out$breaks <- ti
+    sc <- survfit(Surv(start, stop, 1 - status) ~ 1, data = x$.data)
+    if (min(sc$surv) == 0) 
+        sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
     if (class(x) == "trReg") {
-        ti <- seq(min(x$.data$stop), max(x$.data$stop), length.out = Q)
-        out <- getTL(x$.data$start, x$.data$stop, ti[-c(1, Q)], B)
-        out$Q <- Q - 2
-        out$breaks <- ti
         out$fitQs <- lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
-            tmp <- trReg(Surv(start, stop, status) ~., data = d, method = x$method)
+            tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[,x$vNames]), data = d,
+                         method = x$method,
+                         control = list(sc = list(time = sc$time, surv = sc$surv)))
             tmp$.data$trans <- with(tmp$.data, x$tFun(stop, start, tmp$a))
-            return(tmp)
+            tmp$.data$a <- tmp$a
+            return(tmp$.data)
         })
-        out$dat.gof <- do.call(rbind, lapply(out$fitQs, function(xx) xx$.data))
-        sc <- survfit(Surv(trans, stop, 1 - status) ~ 1, data = out$dat.gof)
-        ## guard against infity weights
-        if (min(sc$surv) == 0) 
-            sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
-        wgtX <- approx(sc$time, sc$surv, out$dat.gof$stop[out$dat.gof$status > 0], 
-                       "constant", yleft = 1, yright = min(sc$surv))$y
+        out$dat.gof <- do.call(rbind, out$fitQs)
         if (x$method == "adjust") {
             tq <- quantile(out$dat.gof$trans, 0:(1 + Q) / (1 + Q))
             tmp <- model.matrix( ~ cut(out$dat.gof$trans, breaks = tq,
                                        include.lowest = TRUE) - 1)
             nn <- NULL
             tq <- round(tq, 4)
-            for (i in 1:(Q + 1)) nn[i] <- paste("T in [", tq[i], ", ", tq[i + 1], "]", sep = "")
+            for (i in 1:(Q + 1)) nn[i] <- paste("T in (", tq[i], ", ", tq[i + 1], "]", sep = "")
             colnames(tmp) <- nn
             out$dat.gof <- cbind(out$dat.gof, tmp[,1])
         }
-        out$fit.all <- coxph(Surv(trans, stop, status) ~ .,
-                             data = subset(out$dat.gof, status > 0, select = -start),
-                             weights = 1 / wgtX)
+        out$dat.gof <- subset(out$dat.gof, select = -a)
     }
     if (class(x) == "trSurvfit") {
-        ti <- seq(min(x$qind$obs), max(x$qind$obs), length.out = Q)
-        out <- getTL(x$qind$trun, x$qind$obs, ti[-c(1, Q)], B)
-        out$Q <- Q - 2
-        out$breaks <- ti
         out$fitQs <- lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
             tmp <- with(d, trSurvfit(start, stop, status, tFun = x$tFun))
             tmp$.data$trans <- with(tmp$.data, x$tFun(stop, start, tmp$byTau$par))
-            return(tmp)
+            tmp$.data$a <- tmp$a
+            return(tmp$.data)
         })
-        out$dat.gof <- do.call(rbind, lapply(out$fitQs, function(xx) xx$.data))
-        
+        out$dat.gof <- do.call(rbind, out$fitQs)
     }
     class(out) <- "trgof"
     return(out)

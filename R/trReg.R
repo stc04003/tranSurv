@@ -11,27 +11,22 @@ trFit.kendall <- function(DF, engine, stdErr) {
     obs <- DF$stop
     delta <- DF$status
     ## Finding the latent truncation time
-    sc <- survfit(Surv(trun, obs, 1 - delta) ~ 1)
     trun1 <- trun[delta == 1] ## trun[order(obs)][delta[order(obs)] == 1]
     obs1 <- obs[delta == 1]
     delta1 <- delta[delta == 1]
+    wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
+                   yright = min(engine@sc$surv))$y
     ## optimize getA in many grids
     grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
     tmp <- sapply(1:(engine@G - 1), function(y)
-        optimize(f = function(x) abs(getA(x, trun1, obs1, delta1, sc = sc, FUN = engine@tFun)$PE),
+        optimize(f = function(x) abs(getA(x, trun1, obs1, delta1,
+                                          sc = engine@sc, FUN = engine@tFun)$PE),
                  tol = engine@tol, interval = c(grids[y], grids[y + 1])))
     a <- as.numeric(tmp[1, which.min(tmp[2,])])
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
-    ## guard against infity weights
-    if (min(sc$surv) == 0) 
-        sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
-    wgtX <- approx(sc$time, sc$surv, obs1, "constant", yleft = 1, yright = min(sc$surv))$y
-    out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]),
+    out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1, engine@vNames]),
                                  weights = 1 / wgtX)))
-    ## trun0 <- ifelse(delta == 1, ta[match(obs, obs1)], trun)
-    ## out <- coef(summary(coxph(Surv(trun0, obs, delta) ~ DF[,-(1:3)], weights = 1 / wgtX)))
-    rownames(out$PE) <- names(DF)[-(1:3)]
-    out$varNames <- names(DF)[-(1:3)]
+    out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
     out$a <- a
     return(out)
@@ -44,36 +39,37 @@ trFit.adjust <- function(DF, engine, stdErr) {
     trun <- DF$start
     obs <- DF$stop
     delta <- DF$status
-    sc <- survfit(Surv(trun, obs, 1 - delta) ~ 1)
     trun1 <- trun[delta == 1]
     obs1 <- obs[delta == 1]
     delta1 <- delta[delta == 1]
-    if (min(sc$surv) == 0) 
-        sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
-    wgtX <- approx(sc$time, sc$surv, obs1, "constant", yleft = 1, yright = min(sc$surv))$y
+    wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
+                   yright = min(engine@sc$surv))$y
     coxAj <- function(a) {
         ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
         if (engine@Q > 0)
-            cov <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
+            covs <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
                                        include.lowest = TRUE) - 1)
-        else cov <- ta
-        min(sum(coef(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]) + cov,
-                           weights = 1 / wgtX))[-(1:(NCOL(DF) - 3))]^2, na.rm = TRUE), 1e4)
+        else covs <- ta
+        tmp <- coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1, engine@vNames]) + covs,
+                     weights = 1 / wgtX)
+        min(sum(coef(tmp)[-(1:length(engine@vNames))]^2, na.rm = TRUE), 1e4)
     }
+    ## optimize in many grids
     grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
     tmp <- sapply(1:(engine@G - 1), function(y)
         optimize(f = function(x) suppressWarnings(coxAj(x)), interval = c(grids[y], grids[y + 1])))
     a <- as.numeric(tmp[1, which.min(tmp[2,])])
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
     if (engine@Q > 0)
-        cov <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
+        covs <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
                                    include.lowest = TRUE) - 1)
-    else cov <- ta
-    out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1,-(1:3)]) + cov,
-                              weights = 1 / wgtX)))[1:(NCOL(DF) - 3),,drop = FALSE]
-    rownames(out$PE) <- names(DF)[-(1:3)]
+    else covs <- ta
+    out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~
+                                     as.matrix(DF[delta == 1,engine@vNames]) + covs,
+                                 weights = 1 / wgtX)))
+    out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
+    out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
-    out$varNames <- names(DF)[-(1:3)]
     out$a <- a
     return(out)    
 }
@@ -109,8 +105,9 @@ trFit.boot <- function(DF, engine, stdErr) {
 #' @keywords internal
 setClass("Engine",
          representation(tol = "numeric", lower = "numeric", upper = "numeric",
-                        G = "numeric", Q = "numeric", tFun = "function"),
-         prototype(tol = 1e-2, lower = -1, upper = 20, G = 50, Q = 0),
+                        G = "numeric", Q = "numeric", P = "numeric", 
+                        tFun = "function", vNames = "character", sc = "list"),
+         prototype(tol = 1e-2, lower = -1, upper = 20, G = 50, Q = 0, P = 0),
          contains= "VIRTUAL")
 setClass("kendall", contains = "Engine")
 setClass("adjust", contains = "Engine")
@@ -214,28 +211,35 @@ trReg <- function(formula, data, subset, tFun = "linear",
         resp <- eval(formula[[2]], data)
         covM <- model.matrix(formula, data)
     }
-    vNames <- setdiff(colnames(covM), "(Intercept)") # attr(terms(formula), "term.labels")
+    engine@vNames <- setdiff(colnames(covM), "(Intercept)") # attr(terms(formula), "term.labels")
     if (!is.Surv(resp)) stop("Response must be a Surv resect")
     if (!match("start", attr(resp, "dimnames")[[2]])) stop("Missing left-truncation time")
     engine@lower <- ifelse(engine@lower == -Inf,  -.Machine$integer.max, engine@lower)
     engine@upper <- ifelse(engine@upper == Inf, .Machine$integer.max, engine@upper)
     formula[[2]] <- NULL
+    DF <- as.data.frame(unclass(resp))
+    if (!length(engine@sc)) {
+        sc <- survfit(Surv(start, stop, 1 - status) ~ 1, data = DF)
+        if (min(sc$surv) == 0) 
+            sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
+        engine@sc <- list(time = sc$time, surv = sc$surv)
+    }
     if (formula == ~1) {
-        DF <- as.data.frame(unclass(resp))
         out <- trSurvfit(DF$start, DF$stop, DF$status, trans = tFun, plots = FALSE,
                          control = trSurv.control(lower = engine@lower, upper = engine@upper))
         class(out) <- "trSurvfit"
     } else {
-        DF <- as.data.frame(cbind(resp, covM)) ## First 3 columns reserved to `start`, `stop`, `status`
-        DF <- DF[,which(colnames(DF) != "(Intercept)")]
+        DF <- as.data.frame(cbind(DF, covM)) ## First 3 columns reserved for `start`, `stop`, `status`
+        DF <- DF[,(colnames(DF) != "(Intercept)")]
         out <- trFit(DF, engine, stdErr)
         class(out) <- "trReg"
     }
     out$Call <- Call
     out$B <- B
     out$Q <- engine@Q
+    out$P <- engine@P
     out$tFun <- engine@tFun
-    out$vNames <- vNames
+    out$vNames <- engine@vNames
     out$method <- method
     out$.data <- DF 
     out

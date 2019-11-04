@@ -1,5 +1,5 @@
 #' @export
-print.condKendall <- function(x, ...) {
+print.cKendall <- function(x, ...) {
     cat("\n Test for quasi-independence with conditional Kendall's tau\n")
     cat("\n Call: ")
     print(x$Call)
@@ -43,13 +43,13 @@ print.trReg <- function(x, ...) {
     cat("\n Sample size =", nrow(x$.data))
     cat("\n Number of events = ", sum(x$.data$status))
     cat("\n Transformation parameter is", x$a, "\n\n")
+    cat("\n Standard errors obtained from", x$B, "bootstrap samples.\n")
     tab <- cbind(coef = round(x$PE[,1], 3),
                  "se(coef)" = round(x$SE, 3),
                  z = round(x$PE[,1] / x$SE, 3),
                  "Pr(>|z|)" = round(2 * pnorm(-abs(x$PE[,1] / x$SE)), 3))
     rownames(tab) <- x$varNames
     printCoefmat(as.data.frame(tab), P.values = TRUE, has.Pvalue = TRUE)
-    cat("\n Standard errors obtained from ", x$B, " bootstrap samples.")
     cat("\n")
 }
 
@@ -61,12 +61,15 @@ summary.trReg <- function(x, ...) {
 #' @export
 print.trgof <- function(x, ...) {
     cat("\n Overall signficances based on left-truncated regression model: p-value =", round(x$pval))
-    cat("\n Transformation model based on", x$Q, "segements.")
-    vv <- NULL
-    for (i in 1:(length(x$breaks) - 1)) vv[i] <- paste("(", x$breaks[i], ", ", x$breaks[i + 1], "]", sep = "")
-    cat("\n The segments are", paste(vv, collapse = " "), "\n\n")
-    if (!is.null(x$fit.all)) {
-        printCoefmat(round(coef(summary(x$fit.all)), 4), P.values = TRUE, has.Pvalue = TRUE)
-        cat("\n")
+    cat("\n\n The segments and the corresponding transformation parameters are:")
+    for (i in 1:length(x$fitQs)) {
+        cat("\n   For segment",
+            paste("(", round(x$breaks[i], 3), ", ", round(x$breaks[i + 1], 3), "]", sep = ""), 
+            ", the transformation parameter is", unique(x$fitQs[[i]]$a))
     }
+    cat("\n")
+    ## if (!is.null(x$fit.all)) {
+    ##     printCoefmat(round(coef(summary(x$fit.all)), 4), P.values = TRUE, has.Pvalue = TRUE)
+    ##     cat("\n")
+    ## }
 }

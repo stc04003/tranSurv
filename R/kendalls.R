@@ -131,7 +131,7 @@ cKendall <- function(trun, obs, delta = NULL, method = "MB",
     out$p.value <- 2 - 2 * pnorm(out$STAT)
     out$trans <- trans
     out$a <- a
-    class(out) <- "condKendall"
+    class(out) <- "cKendall"
     out
 }
 
