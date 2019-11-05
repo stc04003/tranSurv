@@ -49,6 +49,8 @@ print.trReg <- function(x, ...) {
     print(x$Call)
     cat("\n Sample size =", nrow(x$.data))
     cat("\n Number of events = ", sum(x$.data$status))
+    x$breaks[which.min(x$breaks)] <- -Inf
+    x$breaks[which.max(x$breaks)] <- Inf
     if (length(x$a) > 1) {
         cat("\n\n The segments and the corresponding transformation parameters are:")
         for (i in 1:length(x$a)) {
@@ -70,12 +72,13 @@ print.trReg <- function(x, ...) {
         if (is.matrix(x$PEta))
             tab2 <- cbind(coef = round(x$PEta[,1], 3),
                           "se(coef)" = round(x$PEta[,3], 3),
-                          z = round(x$PE[,4], 3),
-                          "Pr(>|z|)" = round(x$PE[,5], 3))
-        else tab2 <- data.frame(coef = round(x$PEta[1], 3),
-                          "se(coef)" = round(x$PEta[3], 3),
-                          z = round(x$PE[4], 3),
-                          "Pr(>|z|)" = round(x$PE[5], 3))
+                          z = round(x$PEta[,4], 3),
+                          "Pr(>|z|)" = round(x$PEta[,5], 3))
+        else tab2 <- cbind(coef = round(x$PEta[1], 3),
+                           "se(coef)" = round(x$PEta[3], 3),
+                           z = round(x$PEta[4], 3),
+                           "Pr(>|z|)" = round(x$PEta[5], 3))
+        rownames(tab2) <- rownames(x$PEta)
         printCoefmat(as.data.frame(tab2), P.values = TRUE, has.Pvalue = TRUE)
         cat("\n")
     }
@@ -89,8 +92,10 @@ summary.trReg <- function(x, ...) {
 
 #' @export
 print.trgof <- function(x, ...) {
-    cat("\n Overall signficances based on left-truncated regression model: p-value =", round(x$pval))
+    cat("\n Overall signficances based on left-truncated regression model: p-value =", round(x$pval, 4))
     cat("\n\n The segments and the corresponding transformation parameters are:")
+    x$breaks[which.min(x$breaks)] <- -Inf
+    x$breaks[which.max(x$breaks)] <- Inf
     for (i in 1:length(x$fitQs)) {
         cat("\n   For segment",
             paste("(", round(x$breaks[i], 3), ", ", round(x$breaks[i + 1], 3), "]", sep = ""), 

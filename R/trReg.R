@@ -61,7 +61,7 @@ trFit.kendall2 <- function(DF, engine, stdErr) {
     trun1 <- trun[delta == 1] ## trun[order(obs)][delta[order(obs)] == 1]
     obs1 <- obs[delta == 1]
     delta1 <- delta[delta == 1]
-     ta1 <- DF2$ta[delta == 1]
+    ta1 <- DF2$ta[delta == 1]
     wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
                    yright = min(engine@sc$surv))$y
     suppressWarnings(out$PE <- coef(summary(coxph(Surv(ta1, obs1, delta1) ~
@@ -111,12 +111,14 @@ trFit.adjust <- function(DF, engine, stdErr) {
     out$PEta <- out$PE[-(1:(length(engine@vNames))),,drop = FALSE]
     out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
     if (engine@Q > 0) {
+        tq[which.min(tq)] <- -Inf
+        tq[which.max(tq)] <- Inf
         nn <- NULL
-        tq <- round(tq, 4)
+        tq <- round(tq, 3)
         for (i in 1:(engine@Q + 1)) nn[i] <- paste("T'(a) in (", tq[i], ", ", tq[i + 1], "]", sep = "")
         rownames(out$PEta) <- nn
     } else rownames(out$PEta) <- "T'(a)"
-    out$PEta <- out$PEta[complete.cases(out$PEta),]
+    out$PEta <- out$PEta[complete.cases(out$PEta),,drop = FALSE]
     out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
     out$a <- a
@@ -161,12 +163,14 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
     out$PEta <- out$PE[-(1:(length(engine@vNames))),,drop = FALSE]
     out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
     if (engine@Q > 0) {
+        tq[which.min(tq)] <- -Inf
+        tq[which.max(tq)] <- Inf
         nn <- NULL
-        tq <- round(tq, 4)
+        tq <- round(tq, 3)
         for (i in 1:(engine@Q + 1)) nn[i] <- paste("T'(a) in (", tq[i], ", ", tq[i + 1], "]", sep = "")
         rownames(out$PEta) <- nn
     } else rownames(out$PEta) <- "T'(a)"
-    out$PEta <- out$PEta[complete.cases(out$PEta),]
+    out$PEta <- out$PEta[complete.cases(out$PEta),,drop = FALSE]
     out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
     out$a <- unique(DF2$a)

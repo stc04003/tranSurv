@@ -52,14 +52,14 @@ gof <- function(x, B = 200, P = 1) {
             tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[,x$vNames]), data = d,
                          method = x$method,
                          control = list(sc = list(time = sc$time, surv = sc$surv), Q = Q))
-            tmp$.data$trans <- with(tmp$.data, x$tFun(stop, start, tmp$a))
+            tmp$.data$ta <- with(tmp$.data, x$tFun(stop, start, tmp$a))
             tmp$.data$a <- tmp$a
             return(tmp$.data)
         })
         out$dat.gof <- do.call(rbind, out$fitQs)
-        if (x$method == "adjust") {
-            tq <- quantile(out$dat.gof$trans, 0:(1 + Q) / (1 + Q))
-            tmp <- model.matrix( ~ cut(out$dat.gof$trans, breaks = tq,
+        if (x$method == "adjust" & Q > 0) {
+            tq <- quantile(out$dat.gof$ta, 0:(1 + Q) / (1 + Q))
+            tmp <- model.matrix( ~ cut(out$dat.gof$ta, breaks = tq,
                                        include.lowest = TRUE) - 1)
             nn <- NULL
             tq <- round(tq, 4)
@@ -67,12 +67,11 @@ gof <- function(x, B = 200, P = 1) {
             colnames(tmp) <- nn
             out$dat.gof <- cbind(out$dat.gof, tmp) ##[,1])
         }
-        out$dat.gof <- subset(out$dat.gof, select = -a)
     }
     if (class(x) == "trSurvfit") {
         out$fitQs <- lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
             tmp <- with(d, trSurvfit(start, stop, status, tFun = x$tFun))
-            tmp$.data$trans <- with(tmp$.data, x$tFun(stop, start, tmp$byTau$par))
+            tmp$.data$ta <- with(tmp$.data, x$tFun(stop, start, tmp$byTau$par))
             tmp$.data$a <- tmp$byTau$par
             return(tmp$.data)
         })
