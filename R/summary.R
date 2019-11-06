@@ -10,9 +10,9 @@ print.cKendall <- function(x, ...) {
 }
 
 #' @export
-coef.trReg <- function(x, ...) {
-    tmp <- x$PE[,1]
-    names(tmp) <- x$vNames
+coef.trReg <- function(object, ...) {
+    tmp <- object$PE[,1]
+    names(tmp) <- object$vNames
     return(tmp)
 }
 
@@ -87,8 +87,8 @@ print.trReg <- function(x, ...) {
 }
 
 #' @export
-summary.trReg <- function(x, ...) {
-    print(x)
+summary.trReg <- function(object, ...) {
+    print(object)
 }
 
 #' @export

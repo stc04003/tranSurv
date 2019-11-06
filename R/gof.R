@@ -16,17 +16,23 @@ globalVariables(c("start", "status")) ## global variables for gof()
 #' The regression estimates can be obtained by the left-truncated regression model (Karlsson and Lindmark, 2014).
 #' To evaluate the goodness of fit of the transformation model,
 #' the \code{gof()} function directly test the inearity in \eqn{X} by considering larger model that are nonlinear in \eqn{X}.
-#' In particular, we expand the covariates \eqn{X} to \code{Q} piecewise linearity terms and test for equality of the associated coefficients.
+#' In particular, we expand the covariates \eqn{X} to \code{P} piecewise linearity terms and test for equality of the associated coefficients.
 #' 
 #' 
 #' @param x an object of class \code{trSurvfit} returned by the \code{trSurvfit()} or the \code{trReg()} function or a survival object returned by the \code{Surv()}.
-#' @param B a integer value specifies the bootstrap size for the left-truncated regression model. A value greater than 2 is required. 
-#' @param P a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.
+#' @param B an integer value specifies the bootstrap size for the left-truncated regression model. A value greater than 2 is required. 
+#' @param P an integer value specifies number of breakpoints to test the linearity of the transformation model.
+#' When \code{P > 0}, \eqn{P} breakpoints divides the event times into \eqn{P} equal spaced segments.
+#' Piecewise linear function constructed from those segments of event times  are used in the left-truncated regression model,
+#' and the overall significance testing if the coefficient estimates are equal is reported. 
+#' Default value for \code{P} is 1. See \bold{Details} for a description of the goodness of fit procedure. 
 #' 
 #' @export
 #' @example inst/examples/ex_gof.R
-#' @importFrom stats pchisq quantile
+#' @importFrom stats pchisq quantile complete.cases
 #' @importFrom utils combn
+#' @importFrom graphics boxplot
+#' @importFrom methods is
 #'
 #' @references Karlsson, M., Lindmark, A. (2014) truncSP: An R Package for Estimation of Semi-Parametric Truncated Linear Regression Models, \emph{Journal of Statistical Software}, \bold{57} (14), pp 1--19.
 #' @return A list containing the following elements

@@ -39,6 +39,11 @@ When \code{B = 0} (default), the bootstrap standard errors will not be computed.
   \item{\code{G}}{The number of grids used in the search for the transformation parameter; default is 50.
 A smaller \code{G} could results in faster search, but might be inaccurate.}
   \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}. The default is 0.}
+  \item{\code{P}}{The number of breakpoints to divide the event times into equally spaced segmenets.
+When \code{P > 1}, the latent truncation time, \eqn{T'(a)} will be computed in each subset.
+The transformation model is then applied to the aggregated data.} 
+  \item{\code{a}}{The transformation parameter. When this is specified, the transformation model is applied based on the specified \code{a}.
+                  When this is not specified, an optimized \code{a} will be determined by optimization one of the quasi-independence measure. See \bold{Details}.}
   \item{\code{parallel}}{an logical value indicating whether parallel computation will be applied when \code{B > 0}.}
   \item{\code{parCl}}{an integer value specifying the number of CPU cores to be used when \code{parallel = TRUE}.
 The default value is half the CPU cores on the current host.}
@@ -70,28 +75,6 @@ chan <- subset(channing, entry < exit)
 trReg(Surv(entry, exit, cens) ~ sex, data = chan)
 trReg(Surv(entry, exit, cens) ~ sex, data = chan, method = "adjust", control = list(G = 10))
 
-
-library(tranSurv)
-
-fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan)
-gg <- gof(fit, B = 10)
-
-
-debug(trReg)
-debug(trFit.adjust)
-trFit.adjust(DF, engine, stdErr)
-
-
-lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
-    tmp <- trReg(Surv(start, stop, status) ~ ., data = d, method = x$method)
-    tmp$.data$trans <- with(tmp$.data, x$tFun(stop, start, tmp$a))
-    tmp$.data$a <- tmp$a
-    return(tmp$.data)
-})
-
-dat1 <- split(x$.data, cut(x$.data$stop, ti))[[1]]
-trReg(Surv(start, stop, status) ~ dat1[,x$vNames], data = dat1,
-      control = list(sc = list(time = sc$time, surv = sc$surv)))
 }
 \seealso{
 \code{\link{trSurvfit}}

@@ -7,6 +7,6 @@
 #'
 #' @importFrom survival Surv is.Surv
 #' @name Surv
-#' @aliases Surv
+#' @aliases Surv is.Surv
 #' @export Surv is.Surv
 NULL

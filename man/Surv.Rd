@@ -2,6 +2,7 @@
 % Please edit documentation in R/Surv.R
 \name{Surv}
 \alias{Surv}
+\alias{is.Surv}
 \title{This is the \code{Surv} function imported from \code{survival}}
 \description{
 This function is imported from the \code{survival} package,
