@@ -54,10 +54,11 @@ print.trReg <- function(x, ...) {
     if (length(x$a) > 1) {
         cat("\n\n The segments and the corresponding transformation parameters are:")
         for (i in 1:length(x$a)) {
-            cat("\n   For segment",
+            cat("\n   In segment",
                 paste("(", round(x$breaks[i], 3), ", ", round(x$breaks[i + 1], 3), "]", sep = ""), 
                 ", the transformation parameter is", x$a[i])
         }
+        cat("\n")
     } else cat("\n\n Transformation parameter is", x$a, "\n")
     cat("\n Standard errors obtained from", x$B, "bootstrap samples.\n")
     tab <- cbind(coef = round(x$PE[,1], 3),
