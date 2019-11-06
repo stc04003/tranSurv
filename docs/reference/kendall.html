@@ -96,6 +96,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -161,10 +164,10 @@ implemented in C.</p>
 <span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/MASS/topics/mvrnorm'>mvrnorm</a></span>(<span class='fl'>5000</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/matrix'>matrix</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>.5</span>, <span class='fl'>.5</span>, <span class='fl'>1</span>), <span class='fl'>2</span>))
 <span class='co'>## True kendall's tau is 2 * asin(.5) / pi</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='fu'>kendall</span>(<span class='no'>dat</span>)))</div><div class='output co'>#&gt; [1] 0.3486412</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.073   0.000   0.072 </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/cor'>cor</a></span>(<span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"kendall"</span>)))</div><div class='output co'>#&gt;           [,1]      [,2]
+#&gt;   0.077   0.000   0.077 </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/cor'>cor</a></span>(<span class='no'>dat</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"kendall"</span>)))</div><div class='output co'>#&gt;           [,1]      [,2]
 #&gt; [1,] 1.0000000 0.3486412
 #&gt; [2,] 0.3486412 1.0000000</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.784   0.000   0.784 </div></pre>
+#&gt;   0.779   0.000   0.780 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

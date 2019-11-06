@@ -54,9 +54,8 @@ The restricted IPW Kendall's tau (Austin and Betensky, 2014) gives the same resu
 The transformation parameter, $a$, turns out to be $-0.3011$. 
 The estimated survival curve (based on $a$) can be plotted with `survfit`:
 ```{R data-survfit}
-library(survival)
 foo <- with(dat, trSurvfit(trun, obs, delta))
-plot(survfit(Surv(ta, obs, delta) ~ 1, data = foo$qind))
+plot(foo)
 ```
 
 ## Simulation

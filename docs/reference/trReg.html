@@ -96,6 +96,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -140,7 +143,7 @@ See <code><a href='https://www.rdocumentation.org/packages/survival/topics/Surv'
     </tr>
     <tr>
       <th>data</th>
-      <td><p>an optional data.frame in which to interpret the variables occurring
+      <td><p>an optional data frame in which to interpret the variables occurring
 in the <code>formula</code>.</p></td>
     </tr>
     <tr>
@@ -149,7 +152,7 @@ in the <code>formula</code>.</p></td>
     </tr>
     <tr>
       <th>tFun</th>
-      <td><p>a character string specifying the transformation function or a user specified function indicating the relationship between X, T, and a.
+      <td><p>a character string specifying the transformation function or a user specified function indicating the relationship between \(X\), \(T\), and \(a\).
 When <code>tFun</code> is a character, the following are permitted:</p><dl class='dl-horizontal'>
   <dt>linear</dt><dd><p>linear transformation structure,</p></dd>
   <dt>log</dt><dd><p>log-linear transformation structure,</p></dd>
@@ -174,7 +177,12 @@ When <code>B = 0</code> (default), the bootstrap standard errors will not be com
   <dt><code>G</code></dt><dd><p>The number of grids used in the search for the transformation parameter; default is 50.
 A smaller <code>G</code> could results in faster search, but might be inaccurate.</p></dd>
   <dt><code>Q</code></dt><dd><p>The number of cutpoints for the truncation time used when <code>method = "adjust"</code>. The default is 0.</p></dd>
-  <dt><code>parallel</code></dt><dd><p>an logical value indicating whether parallel computation will be applied when <code>B</code> is not 0.</p></dd>
+  <dt><code>P</code></dt><dd><p>The number of breakpoints to divide the event times into equally spaced segmenets.
+When <code>P &gt; 1</code>, the latent truncation time, \(T'(a)\) will be computed in each subset.
+The transformation model is then applied to the aggregated data.</p></dd> 
+  <dt><code>a</code></dt><dd><p>The transformation parameter. When this is specified, the transformation model is applied based on the specified <code>a</code>.
+                  When this is not specified, an optimized <code>a</code> will be determined by optimization one of the quasi-independence measure. See <b>Details</b>.</p></dd>
+  <dt><code>parallel</code></dt><dd><p>an logical value indicating whether parallel computation will be applied when <code>B &gt; 0</code>.</p></dd>
   <dt><code>parCl</code></dt><dd><p>an integer value specifying the number of CPU cores to be used when <code>parallel = TRUE</code>.
 The default value is half the CPU cores on the current host.</p></dd>
 </dl></td>
@@ -194,7 +202,7 @@ The quasi-independent truncation time, \(U\), is obtained by inverting the test 
   <dt><code>method = "kendall"</code></dt><dd><p>by minimizing the absolute value of the restricted inverse probability weighted Kendall's tau or maximize the corresponding \(p\)-value.
 This is the same procedure used in the <code>trSUrvfit()</code> function.</p></dd>
   <dt><code>method = "adjust"</code></dt><dd><p>includes a function of latent truncation time, \(U\), as a covariate.
-  A piece-wise function is constructed based on <code>Q+1</code> indicator functions on whether \(U\) falls in the \(Q\)th and the (\(Q+1\))th percentile,
+  A piece-wise function is constructed based on (\(Q + 1\)) indicator functions on whether \(U\) falls in the \(Q\)th and the (\(Q+1\))th percentile,
   where \(Q\) is the number of cutpoints used. See <code>control</code> for details. 
   The transformation parameter, \(a\), is then chosen to minimize the significance of the coefficient parameter.</p></dd></dl>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
@@ -209,8 +217,10 @@ This is the same procedure used in the <code>trSUrvfit()</code> function.</p></d
 #&gt; 
 #&gt;  Sample size = 457
 #&gt;  Number of events =  175
+#&gt; 
 #&gt;  Transformation parameter is -0.8033718 
 #&gt; 
+#&gt;  Standard errors obtained from 0 bootstrap samples.
 #&gt;         coef se(coef)  z Pr(&gt;|z|)
 #&gt; sexMale 0.51       NA NA       NA
 #&gt; </div><div class='input'><span class='fu'>trReg</span>(<span class='fu'><a href='Surv.html'>Surv</a></span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>) ~ <span class='no'>sex</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>chan</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"adjust"</span>, <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>G</span> <span class='kw'>=</span> <span class='fl'>10</span>))</div><div class='output co'>#&gt; 
@@ -219,10 +229,17 @@ This is the same procedure used in the <code>trSUrvfit()</code> function.</p></d
 #&gt; 
 #&gt;  Sample size = 457
 #&gt;  Number of events =  175
+#&gt; 
 #&gt;  Transformation parameter is -0.8354068 
 #&gt; 
+#&gt;  Standard errors obtained from 0 bootstrap samples.
 #&gt;          coef se(coef)  z Pr(&gt;|z|)
 #&gt; sexMale 0.503       NA NA       NA
+#&gt; 
+#&gt; 
+#&gt;  Coefficient estimates for transformed truncation times used in the adjusted model:
+#&gt;       coef se(coef)      z Pr(&gt;|z|)
+#&gt; T'(a)    0        0 -0.001        1
 #&gt; </div><div class='input'>
 </div></pre>
   </div>

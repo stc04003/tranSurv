@@ -96,6 +96,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -125,23 +128,26 @@
     <p>Provide goodness-of-fit diagnostics for the transformation model.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>gof</span>(<span class='no'>x</span>, <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>Q</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
+    <pre class="usage"><span class='fu'>gof</span>(<span class='no'>x</span>, <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>P</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>an object of class <code>trSurvfit</code> returned by the
-<code><a href='trSurvfit.html'>trSurvfit()</a></code> or the <code><a href='trReg.html'>trReg()</a></code> function.</p></td>
+      <td><p>an object of class <code>trSurvfit</code> returned by the <code><a href='trSurvfit.html'>trSurvfit()</a></code> or the <code><a href='trReg.html'>trReg()</a></code> function or a survival object returned by the <code><a href='Surv.html'>Surv()</a></code>.</p></td>
     </tr>
     <tr>
       <th>B</th>
-      <td><p>a integer value specifies the bootstrap size.</p></td>
+      <td><p>an integer value specifies the bootstrap size for the left-truncated regression model. A value greater than 2 is required.</p></td>
     </tr>
     <tr>
-      <th>Q</th>
-      <td><p>a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.</p></td>
+      <th>P</th>
+      <td><p>an integer value specifies number of breakpoints to test the linearity of the transformation model.
+When <code>P &gt; 0</code>, \(P\) breakpoints divides the event times into \(P\) equal spaced segments.
+Piecewise linear function constructed from those segments of event times  are used in the left-truncated regression model,
+and the overall significance testing if the coefficient estimates are equal is reported. 
+Default value for <code>P</code> is 1. See <b>Details</b> for a description of the goodness of fit procedure.</p></td>
     </tr>
     </table>
 
@@ -166,7 +172,7 @@ $$X - T = -(1 + a) E(U) + (1 + a) X - (1 + a) \times [U - E(U)] := \beta_0 + \be
 The regression estimates can be obtained by the left-truncated regression model (Karlsson and Lindmark, 2014).
 To evaluate the goodness of fit of the transformation model,
 the <code>gof()</code> function directly test the inearity in \(X\) by considering larger model that are nonlinear in \(X\).
-In particular, we expand the covariates \(X\) to <code>Q</code> piecewise linearity terms and test for equality of the associated coefficients.</p>
+In particular, we expand the covariates \(X\) to <code>P</code> piecewise linearity terms and test for equality of the associated coefficients.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Karlsson, M., Lindmark, A. (2014) truncSP: An R Package for Estimation of Semi-Parametric Truncated Linear Regression Models, <em>Journal of Statistical Software</em>, <b>57</b> (14), pp 1--19.</p>
@@ -177,13 +183,10 @@ In particular, we expand the covariates \(X\) to <code>Q</code> piecewise linear
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='trReg.html'>trReg</a></span>(<span class='fu'><a href='Surv.html'>Surv</a></span>(<span class='no'>entry</span>, <span class='no'>exit</span>, <span class='no'>cens</span>) ~ <span class='no'>sex</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>chan</span>)
 <span class='fu'>gof</span>(<span class='no'>fit</span>, <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>25</span>)</div><div class='output co'>#&gt; 
 #&gt;  Overall signficances based on left-truncated regression model: p-value = 0
-#&gt;  Transformation model based on 1 segements.
-#&gt;  The segments are (777, 992] (992, 1207] 
 #&gt; 
-#&gt;           coef exp(coef) se(coef)      z  Pr(&gt;|z|)    
-#&gt; sexMale 0.4682    1.5971   0.1145 4.0887 &lt; 2.2e-16 ***
-#&gt; ---
-#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#&gt;  The segments and the corresponding transformation parameters are:
+#&gt;    For segment (-Inf, 988] , the transformation parameter is -0.2554195
+#&gt;    For segment (988, Inf] , the transformation parameter is -0.8103057
 #&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

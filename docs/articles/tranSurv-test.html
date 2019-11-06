@@ -60,6 +60,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -84,7 +87,7 @@
 </h1>
                         <h4 class="author">Steven Chiou</h4>
             
-            <h4 class="date">2019-10-29</h4>
+            <h4 class="date">2019-11-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/stc04003/tranSurv/blob/master/vignettes/tranSurv-test.Rmd"><code>vignettes/tranSurv-test.Rmd</code></a></small>
       <div class="hidden name"><code>tranSurv-test.Rmd</code></div>
@@ -130,9 +133,8 @@
  Transformation parameter by minimizing absolute value of Kendall's tau: -0.3011
  Transformation parameter by maximizing p-value of the test: -0.3011 </code></pre>
 <p>The function <code>trSurvfit</code> gives some important information. The conditional Kendall’s tau for the observed data (before transformation) is 0.5312 with a <span class="math inline">\(p\)</span>-value &lt; 0.001. The restricted IPW Kendall’s tau (Austin and Betensky, 2014) gives the same result. The transformation parameter, <span class="math inline">\(a\)</span>, turns out to be <span class="math inline">\(-0.3011\)</span>. The estimated survival curve (based on <span class="math inline">\(a\)</span>) can be plotted with <code>survfit</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(survival)
-<span class="op">&gt;</span><span class="st"> </span>foo &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(dat, <span class="kw"><a href="../reference/trSurvfit.html">trSurvfit</a></span>(trun, obs, delta))
-<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw">survfit</span>(<span class="kw"><a href="../reference/Surv.html">Surv</a></span>(ta, obs, delta) <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> foo<span class="op">$</span>qind))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>foo &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/with">with</a></span>(dat, <span class="kw"><a href="../reference/trSurvfit.html">trSurvfit</a></span>(trun, obs, delta))
+<span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(foo)</code></pre></div>
 <p><img src="tranSurv-test_files/figure-html/data-survfit-1.png" width="700"></p>
 </div>
 <div id="simulation" class="section level2">
