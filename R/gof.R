@@ -19,9 +19,8 @@ globalVariables(c("start", "status")) ## global variables for gof()
 #' In particular, we expand the covariates \eqn{X} to \code{Q} piecewise linearity terms and test for equality of the associated coefficients.
 #' 
 #' 
-#' @param x an object of class \code{trSurvfit} returned by the
-#' \code{trSurvfit()} or the \code{trReg()} function.
-#' @param B a integer value specifies the bootstrap size.
+#' @param x an object of class \code{trSurvfit} returned by the \code{trSurvfit()} or the \code{trReg()} function or a survival object returned by the \code{Surv()}.
+#' @param B a integer value specifies the bootstrap size for the left-truncated regression model. A value greater than 2 is required. 
 #' @param P a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.
 #' 
 #' @export
@@ -36,18 +35,32 @@ globalVariables(c("start", "status")) ## global variables for gof()
 #'   \item{pval}{the p-value for the equality of the piecewise linearity terms in the expanded model. See \bold{Details}.}
 #' }
 gof <- function(x, B = 200, P = 1) {
-    B <- max(x$B, B, 2)
-    P <- max(x$P, P, 1)
-    Q <- x$Q
+    if (all(!is.trReg(x), !is.trSurvfit(x), !is.Surv(x)))
+        stop("An 'trReg', 'trSurvfit', or 'Surv' xect is required.")
+    out <- NULL
+    input <- class(x)
+    if (is.trReg(x) || is.trSurvfit(x)) {
+        B <- max(x$B, B, 2)
+        P <- max(x$P, P, 1)
+        Q <- x$Q
+    }
+    if (is.Surv(x)) {
+        B <- max(B, 2)
+        P <- max(P, 1)
+        Q <- 0
+        x <- list(.data = as.data.frame(unclass(x)))
+    }
     ti <- x$.data$stop[x$.data$status > 0]
-    ti <- ti[!(ti %in% boxplot(ti, plot = FALSE)$out)]
+    rm <- (ti %in% boxplot(ti, plot = FALSE)$out)
+    ti <- ti[!rm]
     ti <- seq(min(ti), max(ti), length.out = P + 2)
-    out <- getTL(x$.data$start, x$.data$stop, ti[-c(1, P + 2)], B)
+    out <- getTL(x$.data$start[!rm], x$.data$stop[!rm], ti[-c(1, P + 2)], B)
+    out$input <- input
     out$breaks <- ti
     sc <- survfit(Surv(start, stop, 1 - status) ~ 1, data = x$.data)
     if (min(sc$surv) == 0) 
         sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
-    if (class(x) == "trReg") {
+    if (is.trReg(x)) {
         out$fitQs <- lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
             tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[,x$vNames]), data = d,
                          method = x$method,
@@ -67,8 +80,9 @@ gof <- function(x, B = 200, P = 1) {
             colnames(tmp) <- nn
             out$dat.gof <- cbind(out$dat.gof, tmp) ##[,1])
         }
+        colnames(out$dat.gof)[4:(3 + length(x$vNames))] <- x$vNames
     }
-    if (class(x) == "trSurvfit") {
+    if (is.trSurvfit(x)) {
         out$fitQs <- lapply(split(x$.data, cut(x$.data$stop, ti)), function(d) {
             tmp <- with(d, trSurvfit(start, stop, status, tFun = x$tFun))
             tmp$.data$ta <- with(tmp$.data, x$tFun(stop, start, tmp$byTau$par))
@@ -77,7 +91,6 @@ gof <- function(x, B = 200, P = 1) {
         })
         out$dat.gof <- do.call(rbind, out$fitQs)
     }
-    colnames(out$dat.gof)[4:(3 + length(x$vNames))] <- x$vNames
     class(out) <- "trgof"
     return(out)
 }

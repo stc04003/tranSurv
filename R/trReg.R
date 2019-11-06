@@ -16,13 +16,15 @@ trFit.kendall <- function(DF, engine, stdErr) {
     delta1 <- delta[delta == 1]
     wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
                    yright = min(engine@sc$surv))$y
-    ## optimize getA in many grids
-    grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
-    tmp <- sapply(1:(engine@G - 1), function(y)
-        optimize(f = function(x) abs(getA(x, trun1, obs1, delta1,
-                                          sc = engine@sc, FUN = engine@tFun)$PE),
-                 tol = engine@tol, interval = c(grids[y], grids[y + 1])))
-    a <- as.numeric(tmp[1, which.min(tmp[2,])])
+    if (engine@a < -1) {
+        ## optimize getA in many grids
+        grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
+        tmp <- sapply(1:(engine@G - 1), function(y)
+            optimize(f = function(x) abs(getA(x, trun1, obs1, delta1,
+                                              sc = engine@sc, FUN = engine@tFun)$PE),
+                     tol = engine@tol, interval = c(grids[y], grids[y + 1])))
+        a <- as.numeric(tmp[1, which.min(tmp[2,])])
+    } else a <- engine@a    
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
     out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1, engine@vNames]),
                                  weights = 1 / wgtX)))
@@ -46,7 +48,7 @@ trFit.kendall2 <- function(DF, engine, stdErr) {
     pwReg <- lapply(split(DF, cut(DF$stop, ti)), function(d) {
         tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[, engine@vNames]),
                      data = d, method = "kendall", B = 0, tFun = engine@tFun, 
-                     control = list(engine@sc, G = engine@G, Q = engine@Q,
+                     control = list(engine@sc, G = engine@G, Q = engine@Q, a = engine@a, 
                                     tol = engine@tol, lower = engine@lower, upper = engine@upper))
         names(tmp$.data)[-(1:3)] <- engine@vNames
         tmp$.data$ta <- with(tmp$.data, engine@tFun(stop, start, tmp$a))
@@ -85,21 +87,23 @@ trFit.adjust <- function(DF, engine, stdErr) {
     delta1 <- delta[delta == 1]
     wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
                    yright = min(engine@sc$surv))$y
-    coxAj <- function(a) {
-        ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
-        if (engine@Q > 0)
-            covs <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
-                                       include.lowest = TRUE) - 1)
-        else covs <- ta
-        tmp <- coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1, engine@vNames]) + covs,
-                     weights = 1 / wgtX)
-        min(sum(coef(tmp)[-(1:length(engine@vNames))]^2, na.rm = TRUE), 1e4)
-    }
-    ## optimize in many grids
-    grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
-    tmp <- sapply(1:(engine@G - 1), function(y)
-        optimize(f = function(x) suppressWarnings(coxAj(x)), interval = c(grids[y], grids[y + 1])))
-    a <- as.numeric(tmp[1, which.min(tmp[2,])])
+    if (engine@a < -1) {
+        coxAj <- function(a) {
+            ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
+            if (engine@Q > 0)
+                covs <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
+                                            include.lowest = TRUE) - 1)
+            else covs <- ta
+            tmp <- coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1, engine@vNames]) + covs,
+                         weights = 1 / wgtX)
+            min(sum(coef(tmp)[-(1:length(engine@vNames))]^2, na.rm = TRUE), 1e4)
+        }
+        ## optimize in many grids
+        grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
+        tmp <- sapply(1:(engine@G - 1), function(y)
+            optimize(f = function(x) suppressWarnings(coxAj(x)), interval = c(grids[y], grids[y + 1])))
+        a <- as.numeric(tmp[1, which.min(tmp[2,])])
+    } else a <- engine@a
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
     if (engine@Q > 0) {
         tq <- quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q))
@@ -136,7 +140,7 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
     pwReg <- lapply(split(DF, cut(DF$stop, ti)), function(d) {
         tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[, engine@vNames]),
                      data = d, method = "adjust", B = 0, tFun = engine@tFun, 
-                     control = list(engine@sc, G = engine@G, Q = engine@Q, P = 0, 
+                     control = list(engine@sc, G = engine@G, Q = engine@Q, P = 0, a = engine@a,
                                     tol = engine@tol, lower = engine@lower, upper = engine@upper))
         names(tmp$.data)[-(1:3)] <- engine@vNames
         tmp$.data$ta <- with(tmp$.data, engine@tFun(stop, start, tmp$a))
@@ -208,9 +212,9 @@ trFit.boot <- function(DF, engine, stdErr) {
 #' @keywords internal
 setClass("Engine",
          representation(tol = "numeric", lower = "numeric", upper = "numeric",
-                        G = "numeric", Q = "numeric", P = "numeric", 
+                        G = "numeric", Q = "numeric", P = "numeric", a = "numeric", 
                         tFun = "function", vNames = "character", sc = "list"),
-         prototype(tol = 1e-2, lower = -1, upper = 20, G = 50, Q = 0, P = 0),
+         prototype(tol = 1e-2, lower = -1, upper = 20, G = 50, Q = 0, P = 0, a = -2),
          contains= "VIRTUAL")
 setClass("kendall", contains = "Engine")
 setClass("adjust", contains = "Engine")
@@ -358,3 +362,6 @@ trReg <- function(formula, data, subset, tFun = "linear",
     out$.data <- DF 
     out
 }
+
+is.trReg <- function(x) is(x, "trReg")
+is.trSurvfit <- function(x) is(x, "trSurvfit")

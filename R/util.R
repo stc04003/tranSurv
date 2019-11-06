@@ -12,3 +12,4 @@ uniroot.all <- function (f, interval, lower= min(interval), upper= max(interval)
     else Equi <- NULL
     return(Equi)
 }
+

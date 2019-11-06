@@ -4,13 +4,12 @@
 \alias{gof}
 \title{Goodness of fit based on left-truncated regression model}
 \usage{
-gof(x, B = 200, P = 1, Q = 0)
+gof(x, B = 200, P = 1)
 }
 \arguments{
-\item{x}{an object of class \code{trSurvfit} returned by the
-\code{trSurvfit()} or the \code{trReg()} function.}
+\item{x}{an object of class \code{trSurvfit} returned by the \code{trSurvfit()} or the \code{trReg()} function or a survival object returned by the \code{Surv()}.}
 
-\item{B}{a integer value specifies the bootstrap size.}
+\item{B}{a integer value specifies the bootstrap size for the left-truncated regression model. A value greater than 2 is required.}
 
 \item{P}{a integer value specifies number of breakpoints to test the linearity of the transformation model. Default value is 1.}
 }

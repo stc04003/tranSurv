@@ -5,8 +5,8 @@
 #' and \code{trSurvfit}. See \code{\link[survival]{Surv}} for the
 #' documentation on \code{Surv}.
 #'
-#' @importFrom survival Surv
+#' @importFrom survival Surv is.Surv
 #' @name Surv
 #' @aliases Surv
-#' @export Surv
+#' @export Surv is.Surv
 NULL

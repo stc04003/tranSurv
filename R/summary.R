@@ -93,17 +93,15 @@ summary.trReg <- function(x, ...) {
 #' @export
 print.trgof <- function(x, ...) {
     cat("\n Overall signficances based on left-truncated regression model: p-value =", round(x$pval, 4))
-    cat("\n\n The segments and the corresponding transformation parameters are:")
-    x$breaks[which.min(x$breaks)] <- -Inf
-    x$breaks[which.max(x$breaks)] <- Inf
-    for (i in 1:length(x$fitQs)) {
-        cat("\n   For segment",
-            paste("(", round(x$breaks[i], 3), ", ", round(x$breaks[i + 1], 3), "]", sep = ""), 
-            ", the transformation parameter is", unique(x$fitQs[[i]]$a))
+    if (x$input != "Surv") {
+        cat("\n\n The segments and the corresponding transformation parameters are:")
+        x$breaks[which.min(x$breaks)] <- -Inf
+        x$breaks[which.max(x$breaks)] <- Inf
+        for (i in 1:length(x$fitQs)) {
+            cat("\n   For segment",
+                paste("(", round(x$breaks[i], 3), ", ", round(x$breaks[i + 1], 3), "]", sep = ""), 
+                ", the transformation parameter is", unique(x$fitQs[[i]]$a))
+        }
     }
     cat("\n\n")
-    ## if (!is.null(x$fit.all)) {
-    ##     printCoefmat(round(coef(summary(x$fit.all)), 4), P.values = TRUE, has.Pvalue = TRUE)
-    ##     cat("\n")
-    ## }
 }
