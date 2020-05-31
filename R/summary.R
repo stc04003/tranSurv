@@ -71,10 +71,14 @@ print.trReg <- function(x, ...) {
     if (!is.null(x$PEta)) {
         cat("\n Coefficient estimates for transformed truncation times used in the adjusted model:\n")
         if (is.matrix(x$PEta))
-            tab2 <- cbind(coef = round(x$PEta[,1], 3),
-                          "se(coef)" = round(x$PEta[,3], 3),
-                          z = round(x$PEta[,4], 3),
-                          "Pr(>|z|)" = round(x$PEta[,5], 3))
+            tab2 <- cbind(coef = round(x$PEta[, "coef"], 3),
+                          "se(coef)" = round(x$PEta[, "se(coef)"], 3),
+                          z = round(x$PEta[, "z"], 3),
+                          "Pr(>|z|)" = round(x$PEta[, "Pr(>|z|)"], 3))
+        ## tab2 <- cbind(coef = round(x$PEta[,1], 3),
+        ##               "se(coef)" = round(x$PEta[,3], 3),
+        ##               z = round(x$PEta[,4], 3),
+        ##               "Pr(>|z|)" = round(x$PEta[,5], 3))
         else tab2 <- cbind(coef = round(x$PEta[1], 3),
                            "se(coef)" = round(x$PEta[3], 3),
                            z = round(x$PEta[4], 3),

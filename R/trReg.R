@@ -99,7 +99,7 @@ trFit.adjust <- function(DF, engine, stdErr) {
             min(sum(coef(tmp)[-(1:length(engine@vNames))]^2, na.rm = TRUE), 1e4)
         }
         ## optimize in many grids
-        grids <- seq(engine@lower + 1e-5, engine@upper, length.out = engine@G)
+        grids <- seq(engine@lower + 1e-3, engine@upper, length.out = engine@G)
         tmp <- sapply(1:(engine@G - 1), function(y)
             optimize(f = function(x) suppressWarnings(coxAj(x)), interval = c(grids[y], grids[y + 1])))
         a <- as.numeric(tmp[1, which.min(tmp[2,])])
@@ -200,9 +200,11 @@ trFit.boot <- function(DF, engine, stdErr) {
         out$SE <- parSapply(cl, 1:stdErr@B, function(x)
             trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
         stopCluster(cl)
-    } else out$SE <- replicate(stdErr@B,
-                               trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
-    if (nrow(out$PE) > 1) out$SE <- apply(out$SE, 1, sd)
+    } else out$SE <- replicate(
+               stdErr@B,
+               tryCatch(trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1],
+                        error = function(e) rep(NA, length(engine@vNames))))
+    if (nrow(out$PE) > 1) out$SE <- apply(out$SE, 1, sd, na.rm = TRUE)
     else out$SE <- sd(out$SE)
     out
 }
