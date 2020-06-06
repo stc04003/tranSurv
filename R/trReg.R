@@ -88,20 +88,31 @@ trFit.adjust <- function(DF, engine, stdErr) {
     wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
                    yright = min(engine@sc$surv))$y
     if (engine@a < -1) {
-        coxAj <- function(a) {
+         coxAj <- function(a, see = TRUE) {
             ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
             if (engine@Q > 0)
-                covs <- model.matrix( ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
-                                            include.lowest = TRUE) - 1)
+                covs <- model.matrix(
+                    ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
+                                                include.lowest = TRUE) - 1)
             else covs <- ta
-            tmp <- coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1, engine@vNames]) + covs,
+            tmp <- coxph(Surv(ta, obs1, delta1) ~
+                             as.matrix(DF[delta == 1, engine@vNames]) + covs,
                          weights = 1 / wgtX)
-            min(sum(coef(tmp)[-(1:length(engine@vNames))]^2, na.rm = TRUE), 1e4)
+            if (see) {
+                return(min(sum(coef(tmp)[-(1:length(engine@vNames))]^2, na.rm = TRUE), 1e4))
+            } else {
+                out <- as.numeric(coef(tmp)[-(1:length(engine@vNames))])
+                return(out[!is.na(out)])
+            }
         }
         ## optimize in many grids
         grids <- seq(engine@lower + 1e-3, engine@upper, length.out = engine@G)
-        tmp <- sapply(1:(engine@G - 1), function(y)
-            optimize(f = function(x) suppressWarnings(coxAj(x)), interval = c(grids[y], grids[y + 1])))
+        grids <- c(grids, sapply(1:max(engine@Q, 1), function(z) 
+            uniroot.all(f = function(x) sapply(x, function(y) coxAj(y, see = FALSE)[z]),
+                        interval = c(engine@lower + 1e-3, engine@upper))))
+        tmp <- sapply(1:(length(grids) - 1), function(y)
+            optimize(f = function(x) suppressWarnings(coxAj(x)),
+                     interval = c(grids[y], grids[y + 1])))
         a <- as.numeric(tmp[1, which.min(tmp[2,])])
     } else a <- engine@a
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
