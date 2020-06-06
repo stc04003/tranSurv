@@ -77,6 +77,7 @@ trFit.kendall2 <- function(DF, engine, stdErr) {
 
 #' @noRd
 #' @keywords internal
+#' @importFrom rootSolve uniroot.all
 trFit.adjust <- function(DF, engine, stdErr) {
     out <- NULL
     trun <- DF$start
@@ -88,12 +89,12 @@ trFit.adjust <- function(DF, engine, stdErr) {
     wgtX <- approx(engine@sc$time, engine@sc$surv, obs1, "constant", yleft = 1,
                    yright = min(engine@sc$surv))$y
     if (engine@a < -1) {
-         coxAj <- function(a, see = TRUE) {
+        coxAj <- function(a, see = TRUE) {
             ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
             if (engine@Q > 0)
                 covs <- model.matrix(
                     ~ cut(ta, breaks = quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q)),
-                                                include.lowest = TRUE) - 1)
+                          include.lowest = TRUE) - 1)
             else covs <- ta
             tmp <- coxph(Surv(ta, obs1, delta1) ~
                              as.matrix(DF[delta == 1, engine@vNames]) + covs,
@@ -106,10 +107,11 @@ trFit.adjust <- function(DF, engine, stdErr) {
             }
         }
         ## optimize in many grids
-        grids <- seq(engine@lower + 1e-3, engine@upper, length.out = engine@G)
+        grids <- seq(max(engine@lower, -.999), engine@upper, length.out = engine@G)
         grids <- c(grids, sapply(1:max(engine@Q, 1), function(z) 
             uniroot.all(f = function(x) sapply(x, function(y) coxAj(y, see = FALSE)[z]),
-                        interval = c(engine@lower + 1e-3, engine@upper))))
+                        interval = c(max(engine@lower, -.999), engine@upper))))
+        grids <- unique(sort(unlist(grids)))
         tmp <- sapply(1:(length(grids) - 1), function(y)
             optimize(f = function(x) suppressWarnings(coxAj(x)),
                      interval = c(grids[y], grids[y + 1])))
@@ -209,7 +211,8 @@ trFit.boot <- function(DF, engine, stdErr) {
         clusterExport(cl = cl,
                       varlist = c("DF", "engine"), envir = environment())
         out$SE <- parSapply(cl, 1:stdErr@B, function(x)
-            trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1])
+            tryCatch(trFit(DF[sample(1:NROW(DF), NROW(DF), TRUE),], engine, NULL)$PE[,1],
+                     error = function(e) rep(NA, length(engine@vNames))))
         stopCluster(cl)
     } else out$SE <- replicate(
                stdErr@B,
