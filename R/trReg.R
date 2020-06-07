@@ -106,11 +106,16 @@ trFit.adjust <- function(DF, engine, stdErr) {
                 return(out[!is.na(out)])
             }
         }
+        ## Filter out lower bound that gives warning (fail to converge in coxph)
+        boundary <- -1 + log(1 + 10^-(1:5), 10)
+        tmp <- sapply(boundary, function(x)
+            tryCatch(coxAj(x), warning = function(e) NA, error = function(e) NA))
+        engine@lower <- min(boundary[!is.na(tmp)])
         ## optimize in many grids
-        grids <- seq(max(engine@lower, -.999), engine@upper, length.out = engine@G)
+        grids <- seq(engine@lower, engine@upper, length.out = engine@G)
         grids <- c(grids, sapply(1:max(engine@Q, 1), function(z) 
             uniroot.all(f = function(x) sapply(x, function(y) coxAj(y, see = FALSE)[z]),
-                        interval = c(max(engine@lower, -.999), engine@upper))))
+                        interval = c(engine@lower, engine@upper))))
         grids <- unique(sort(unlist(grids)))
         tmp <- sapply(1:(length(grids) - 1), function(y)
             optimize(f = function(x) suppressWarnings(coxAj(x)),
