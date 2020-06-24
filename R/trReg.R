@@ -45,7 +45,7 @@ trFit.kendall2 <- function(DF, engine, stdErr) {
     ti <- DF$stop[DF$status > 0]
     ti <- ti[!(ti %in% boxplot(ti, plot = FALSE)$out)]
     out$breaks <- ti <- seq(min(ti), max(ti), length.out = P + 2)
-    pwReg <- lapply(split(DF, cut(DF$stop, ti)), function(d) {
+    pwReg <- lapply(split(DF, cut(DF$stop, ti, include.lowest = TRUE)), function(d) {
         tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[, engine@vNames]),
                      data = d, method = "kendall", B = 0, tFun = engine@tFun, 
                      control = list(engine@sc, G = engine@G, Q = engine@Q, a = engine@a, 
@@ -155,7 +155,7 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
     ti <- DF$stop[DF$status > 0]
     ti <- ti[!(ti %in% boxplot(ti, plot = FALSE)$out)]
     out$breaks <- ti <- seq(min(ti), max(ti), length.out = P + 2)
-    pwReg <- lapply(split(DF, cut(DF$stop, ti)), function(d) {
+    pwReg <- lapply(split(DF, cut(DF$stop, ti, include.lowest = TRUE)), function(d) {
         tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[, engine@vNames]),
                      data = d, method = "adjust", B = 0, tFun = engine@tFun, 
                      control = list(engine@sc, G = engine@G, Q = engine@Q, P = 0, a = engine@a,
