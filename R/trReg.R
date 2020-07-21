@@ -162,7 +162,18 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
     p <- length(ti) - 1
     dats <-split(DF, cut(DF$stop, ti, include.lowest = TRUE) )
     m <- lapply(dats, nrow)
-    getA <- function(a, model = FALSE) {
+    pwReg <- lapply(split(DF, cut(DF$stop, ti, include.lowest = TRUE)), function(d) {
+        tmp <- trReg(Surv(start, stop, status) ~ as.matrix(d[, engine@vNames]),
+                     data = d, method = "adjust", B = 0, tFun = engine@tFun, 
+                     control = list(engine@sc, G = engine@G, Q = engine@Q, P = 0, a = engine@a,
+                                    tol = engine@tol, lower = engine@lower, upper = engine@upper))
+        names(tmp$.data)[-(1:3)] <- engine@vNames
+        tmp$.data$ta <- with(tmp$.data, engine@tFun(stop, start, tmp$a))
+        tmp$.data$a <- tmp$a
+        return(tmp$.data)
+    })    
+    a0 <- unique(do.call(rbind, pwReg)$a)
+    getA2 <- function(a, model = FALSE) {
         if (any(a <= -1)) return(Inf)
         dat0 <- do.call(rbind, dats)
         dat0$ta <- unlist(sapply(1:p, function(x)
@@ -176,15 +187,18 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
         else covs <- dat0$ta
         fm <- as.formula(paste("Surv(ta, stop, status) ~ ", paste(engine@vNames, collapse = "+")))
         tmp <- update(coxph(fm, data = dat0, subset = status > 0, weights = 1 / wgtX), ~ . + covs)
-        if (model) return(tmp)
+        if (model) return(list(model = tmp, ta = dat0$ta))
         else return(coef(tmp)[-(1:length(engine@vNames))])
     }
-    a <- optim(rep(0, 3), fn = function(x) sum(getA(x)^2))$par
-    f <- getA(a, TRUE)
+    a <- optim(a0, fn = function(x) sum(getA2(x)^2, na.rm = TRUE))$par
+    tmp <- getA2(a, TRUE)
+    f <- tmp$model
     out$PE <- coef(summary(f))
     out$PEta <- out$PE[-(1:(length(engine@vNames))),,drop = FALSE]
     out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
     if (engine@Q > 0) {
+        ta <- tmp$ta
+        tq <- quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q))
         tq[which.min(tq)] <- -Inf
         tq[which.max(tq)] <- Inf
         nn <- NULL
