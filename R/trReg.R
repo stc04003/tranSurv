@@ -180,32 +180,36 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
             mapply(engine@tFun, X = dats[[x]]$stop, T = dats[[x]]$start, a[x])))
         dat0$wgtX <- approx(engine@sc$time, engine@sc$surv, dat0$stop, "constant", yleft = 1,
                             yright = min(engine@sc$surv))$y
-        if (engine@Q > 0)
-            covs <- model.matrix(
-                ~ cut(dat0$ta, breaks = quantile(dat0$ta, 0:(1 + engine@Q) / (1 + engine@Q)),
-                      include.lowest = TRUE) - 1)
-        else covs <- dat0$ta
+        if (engine@Q > 0) {
+            q1 <- quantile(dat0$ta[dat0$status > 0], 0:(1 + engine@Q)/(1 + engine@Q))
+            q1[1] <- -Inf
+            q1[length(q1)] <- Inf
+            covs <- model.matrix(~ cut(dat0$ta, breaks = q1, include.lowest = TRUE) - 1)
+
+
+        } else covs <- dat0$ta
         fm <- as.formula(paste("Surv(ta, stop, status) ~ ", paste(engine@vNames, collapse = "+")))
         tmp <- update(coxph(fm, data = dat0, subset = status > 0, weights = 1 / wgtX), ~ . + covs)
-        if (model) return(list(model = tmp, ta = dat0$ta))
-        else return(coef(tmp)[-(1:length(engine@vNames))])
+        if (model) {
+            nn <- NULL
+            if (engine@Q > 0) {
+                tq <- round(q1, 3)
+                for (i in 1:(engine@Q + 1)) nn[i] <- paste("T'(a) in (", tq[i], ", ", tq[i + 1], "]", sep = "")
+            } else nn <- "T'(a)"
+            return(list(model = tmp,
+                        ta = dat0$ta[dat0$status > 0],
+                        taName = nn))
+        } else return(coef(tmp)[-(1:length(engine@vNames))])
     }
-    a <- optim(a0, fn = function(x) sum(getA2(x)^2, na.rm = TRUE))$par
+    a <- tryCatch(optim(a0, fn = function(x) sum(getA2(x)^2, na.rm = TRUE))$par,
+                  error = function(e)
+                      optim(rep(0, p), fn = function(x) sum(getA2(x)^2, na.rm = TRUE))$par)
     tmp <- getA2(a, TRUE)
     f <- tmp$model
     out$PE <- coef(summary(f))
     out$PEta <- out$PE[-(1:(length(engine@vNames))),,drop = FALSE]
     out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
-    if (engine@Q > 0) {
-        ta <- tmp$ta
-        tq <- quantile(ta, 0:(1 + engine@Q) / (1 + engine@Q))
-        tq[which.min(tq)] <- -Inf
-        tq[which.max(tq)] <- Inf
-        nn <- NULL
-        tq <- round(tq, 3)
-        for (i in 1:(engine@Q + 1)) nn[i] <- paste("T'(a) in (", tq[i], ", ", tq[i + 1], "]", sep = "")
-        rownames(out$PEta) <- nn
-    } else rownames(out$PEta) <- "T'(a)"
+    rownames(out$PEta) <- tmp$taName
     out$PEta <- out$PEta[complete.cases(out$PEta),,drop = FALSE]
     out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
