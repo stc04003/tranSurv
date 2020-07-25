@@ -4,8 +4,16 @@
 \alias{cKendall}
 \title{Conditional Kendall's tau}
 \usage{
-cKendall(trun, obs, delta = NULL, method = "MB", weights = NULL,
-  a = 0, trans = "linear", ...)
+cKendall(
+  trun,
+  obs,
+  delta = NULL,
+  method = "MB",
+  weights = NULL,
+  a = 0,
+  trans = "linear",
+  ...
+)
 }
 \arguments{
 \item{trun}{left truncation time satisfying \code{trun} <= \code{obs}.}

@@ -4,8 +4,15 @@
 \alias{trReg}
 \title{Fitting regression model via structural transformation model}
 \usage{
-trReg(formula, data, subset, tFun = "linear", method = c("kendall",
-  "adjust"), B = 0, control = list())
+trReg(
+  formula,
+  data,
+  subset,
+  tFun = "linear",
+  method = c("kendall", "adjust"),
+  B = 0,
+  control = list()
+)
 }
 \arguments{
 \item{formula}{a formula expression, of the form \code{response ~ predictors}.

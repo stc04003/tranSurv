@@ -4,8 +4,11 @@
 \alias{trSurv.control}
 \title{Auxiliary for Controlling trSurvfit Fitting}
 \usage{
-trSurv.control(interval = c(-1, 20), lower = min(interval),
-  upper = max(interval))
+trSurv.control(
+  interval = c(-1, 20),
+  lower = min(interval),
+  upper = max(interval)
+)
 }
 \arguments{
 \item{interval}{a vector containing the end-points of the interval to be searched the transformation parameter.}

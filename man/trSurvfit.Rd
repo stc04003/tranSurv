@@ -4,8 +4,15 @@
 \alias{trSurvfit}
 \title{Estimating survival curves via structural transformation model}
 \usage{
-trSurvfit(trun, obs, delta = NULL, tFun = "linear", plots = FALSE,
-  control = trSurv.control(), ...)
+trSurvfit(
+  trun,
+  obs,
+  delta = NULL,
+  tFun = "linear",
+  plots = FALSE,
+  control = trSurv.control(),
+  ...
+)
 }
 \arguments{
 \item{trun}{left truncation time satisfying \code{trun} <= \code{obs}.}
