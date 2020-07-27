@@ -46,7 +46,7 @@ In particular, we expand the covariates \eqn{X} to \code{P} piecewise linearity 
 data(channing, package = "boot")
 chan <- subset(channing, entry < exit)
 fit <- trReg(Surv(entry, exit, cens) ~ sex, data = chan)
-gof(fit, B = 25)
+gof(fit, B = 10)
 }
 \references{
 Karlsson, M., Lindmark, A. (2014) truncSP: An R Package for Estimation of Semi-Parametric Truncated Linear Regression Models, \emph{Journal of Statistical Software}, \bold{57} (14), pp 1--19.

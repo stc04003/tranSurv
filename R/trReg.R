@@ -1,4 +1,4 @@
-## Functions for different methods
+globalVariables("wgtX") ## global variable for within getA2
 
 #' 1. Find quasi-independent latent truncation time by maximizing conditional Kendall's tau based on the uncensored observations only
 #' 2. Use the latent truncation time in the Cox model as a truncation time
@@ -150,6 +150,7 @@ trFit.adjust <- function(DF, engine, stdErr) {
 }
 
 #' @noRd
+#' @importFrom stats as.formula optim update
 #' @keywords internal
 trFit.adjust2 <- function(DF, engine, stdErr) {
     out <- NULL
