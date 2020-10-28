@@ -23,6 +23,9 @@ trFit.kendall <- function(DF, engine, stdErr) {
             optimize(f = function(x) abs(getA(x, trun1, obs1, delta1,
                                               sc = engine@sc, FUN = engine@tFun)$PE),
                      tol = engine@tol, interval = c(grids[y], grids[y + 1])))
+        tmp2 <- optim(f = function(x)
+            abs(getA(x, trun1, obs1, delta1, sc = engine@sc, FUN = engine@tFun)$PE), par = 0)
+        tmp <- cbind(tmp, c(tmp2$par, tmp2$value))
         a <- as.numeric(tmp[1, which.min(tmp[2,])])
     } else a <- engine@a    
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
@@ -128,10 +131,12 @@ trFit.adjust <- function(DF, engine, stdErr) {
             }
         }
         ## Filter out lower bound that gives warning (fail to converge in coxph)
-        boundary <- -1 + log(1 + 10^-(1:5), 10)
-        tmp <- sapply(boundary, function(x)
-            tryCatch(coxAj(x), warning = function(e) NA, error = function(e) NA))
-        engine@lower <- min(boundary[!is.na(tmp)])
+        if (engine@lower <= -1) {
+            boundary <- -1 + log(1 + 10^-(1:5), 10)
+            tmp <- sapply(boundary, function(x)
+                tryCatch(coxAj(x), warning = function(e) NA, error = function(e) NA))
+            engine@lower <- min(boundary[!is.na(tmp)])
+        }
         ## optimize in many grids
         grids <- seq(engine@lower, engine@upper, length.out = engine@G)
         grids <- c(grids, sapply(1:max(engine@Q, 1), function(z) 
@@ -141,6 +146,8 @@ trFit.adjust <- function(DF, engine, stdErr) {
         tmp <- sapply(1:(length(grids) - 1), function(y)
             optimize(f = function(x) suppressWarnings(coxAj(x)),
                      interval = c(grids[y], grids[y + 1])))
+        tmp2 <- suppressWarnings(optim(f = coxAj, par = 0, control = list(warn.1d.NelderMead = FALSE)))
+        tmp <- cbind(tmp, c(tmp2$par, tmp2$value))
         a <- as.numeric(tmp[1, which.min(tmp[2,])])
     } else a <- engine@a
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
