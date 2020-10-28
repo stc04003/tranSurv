@@ -25,7 +25,7 @@ trFit.kendall <- function(DF, engine, stdErr) {
                      tol = engine@tol, interval = c(grids[y], grids[y + 1])))
         tmp2 <- optim(f = function(x)
             abs(getA(x, trun1, obs1, delta1, sc = engine@sc, FUN = engine@tFun)$PE), par = 0)
-        tmp <- cbind(tmp, c(tmp2$par, tmp2$value))
+        if (tmp2$par > -1) tmp <- cbind(tmp, c(tmp2$par, tmp2$value))
         a <- as.numeric(tmp[1, which.min(tmp[2,])])
     } else a <- engine@a    
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
@@ -147,7 +147,7 @@ trFit.adjust <- function(DF, engine, stdErr) {
             optimize(f = function(x) suppressWarnings(coxAj(x)),
                      interval = c(grids[y], grids[y + 1])))
         tmp2 <- suppressWarnings(optim(f = coxAj, par = 0, control = list(warn.1d.NelderMead = FALSE)))
-        tmp <- cbind(tmp, c(tmp2$par, tmp2$value))
+        if (tmp2$par > -1) tmp <- cbind(tmp, c(tmp2$par, tmp2$value))
         a <- as.numeric(tmp[1, which.min(tmp[2,])])
     } else a <- engine@a
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
