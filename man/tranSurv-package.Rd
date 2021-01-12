@@ -23,12 +23,17 @@ Chiou, S., Austin, M., Qian, J. and Betensky R. A. (2016), Transformation model 
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://github.com/stc04003/tranSurv}
-  \item Report bugs at \url{http://github.com/stc04003/tranSurv/issues}
+  \item \url{https://github.com/stc04003/tranSurv}
+  \item Report bugs at \url{https://github.com/stc04003/tranSurv/issues}
 }
 
 }
 \author{
 \strong{Maintainer}: Sy Han (Steven) Chiou \email{schiou@utdallas.edu}
+
+Authors:
+\itemize{
+  \item Jing Qian \email{qian@schoolph.umass.edu}
+}
 
 }
