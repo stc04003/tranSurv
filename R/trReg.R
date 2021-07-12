@@ -147,7 +147,9 @@ trFit.adjust <- function(DF, engine, stdErr) {
             optimize(f = function(x) suppressWarnings(coxAj(x)),
                      interval = c(grids[y], grids[y + 1])))
         tmp2 <- suppressWarnings(
-            optim(fn = coxAj, par = 0, control = list(warn.1d.NelderMead = FALSE)))
+            optim(fn = function(a) {
+                if (a <= min(grids)) return(Inf)
+                return(coxAj(a)) }, par = 0, control = list(warn.1d.NelderMead = FALSE)))
         if (tmp2$par > -1) tmp <- cbind(tmp, c(tmp2$par, tmp2$value))
         a <- as.numeric(tmp[1, which.min(tmp[2,])])
     } else a <- engine@a
@@ -410,6 +412,11 @@ trReg <- function(formula, data, subset, tFun = "linear",
         sc <- survfit(Surv(start, stop, 1 - status) ~ 1, data = DF)
         if (min(sc$surv) == 0) 
             sc$surv <- ifelse(sc$surv == min(sc$surv), sort(unique(sc$surv))[2], sc$surv)
+        if (length(table(DF$status)) > 1 &
+            sum(head(sc$n.event[sc$n.event > 0] / sc$n.risk[sc$n.event > 0]) == 1) <= 2) {
+            sc$time <- sc$time[sc$n.event > 0]
+            sc$surv <- exp(-cumsum(sc$n.event[sc$n.event > 0] / sc$n.risk[sc$n.event > 0]))
+        }
         engine@sc <- list(time = sc$time, surv = sc$surv)
     }
     if (formula == ~1) {
