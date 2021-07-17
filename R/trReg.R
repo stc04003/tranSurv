@@ -30,7 +30,8 @@ trFit.kendall <- function(DF, engine, stdErr) {
     } else a <- engine@a    
     ta <- mapply(engine@tFun, X = obs1, T = trun1, a = a)
     out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~ as.matrix(DF[delta == 1, engine@vNames]),
-                                 weights = 1 / wgtX, robust = FALSE)))
+                                 weights = 1 / wgtX, robust = FALSE,
+                                 control = coxph.control(timefix = FALSE))))
     out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
     out$a <- a
@@ -92,7 +93,8 @@ trFit.kendall2 <- function(DF, engine, stdErr) {
                    yright = min(engine@sc$surv))$y
     suppressWarnings(out$PE <- coef(summary(coxph(Surv(ta1, obs1, delta1) ~
                                                       as.matrix(DF2[delta == 1, engine@vNames]),
-                                                  weights = 1 / wgtX, robust = FALSE))))
+                                                  weights = 1 / wgtX, robust = FALSE,
+                                                  control = coxph.control(timefix = FALSE)))))
     out$varNames <- rownames(out$PE) <- engine@vNames
     out$SE <- NA
     out$a <- unique(DF2$a)
@@ -122,7 +124,7 @@ trFit.adjust <- function(DF, engine, stdErr) {
             else covs <- ta
             tmp <- coxph(Surv(ta, obs1, delta1) ~
                              as.matrix(DF[delta == 1, engine@vNames]) + covs,
-                         weights = 1 / wgtX, robust = FALSE)
+                         weights = 1 / wgtX, robust = FALSE, control = coxph.control(timefix = FALSE))
             if (see) {
                 return(min(sum(coef(tmp)[-(1:length(engine@vNames))]^2, na.rm = TRUE), 1e4))
             } else {
@@ -160,7 +162,7 @@ trFit.adjust <- function(DF, engine, stdErr) {
     } else covs <- ta
     out$PE <- coef(summary(coxph(Surv(ta, obs1, delta1) ~
                                      as.matrix(DF[delta == 1,engine@vNames]) + covs,
-                                 weights = 1 / wgtX, robust = FALSE)))
+                                 weights = 1 / wgtX, robust = FALSE, control = coxph.control(timefix = FALSE))))
     out$PEta <- out$PE[-(1:(length(engine@vNames))),,drop = FALSE]
     out$PE <- out$PE[1:(length(engine@vNames)),,drop = FALSE]
     if (engine@Q > 0) {
@@ -217,7 +219,8 @@ trFit.adjust2 <- function(DF, engine, stdErr) {
             covs <- model.matrix(~ cut(dat0$ta, breaks = q1, include.lowest = TRUE) - 1)
         } else covs <- dat0$ta
         fm <- as.formula(paste("Surv(ta, stop, status) ~ ", paste(engine@vNames, collapse = "+")))
-        tmp <- update(coxph(fm, data = dat0, subset = status > 0, weights = 1 / wgtX), ~ . + covs, robust = FALSE)
+        tmp <- update(coxph(fm, data = dat0, subset = status > 0, weights = 1 / wgtX), ~ . + covs,
+                      robust = FALSE, control = coxph.control(timefix = FALSE))
         if (model) {
             nn <- NULL
             if (engine@Q > 0) {
