@@ -71,7 +71,7 @@ trSurvfit <- function(trun, obs, delta = NULL, tFun = "linear", plots = FALSE,
     ## delta = censoring indicator
     out <- NULL
     if (is.null(delta)) delta <- rep(1, length(trun))
-    if (class(tFun) == "character") {
+    if (inherits(tFun, "character")) {
         if (tFun == "linear") FUN <- function(X, T, a) (T + a * X) / (1 + a)
         if (tFun == "log") FUN <- function(X, T, a) exp((log(replace(T, 0, 1)) + a * log(X)) / (1 + a))
         if (tFun == "log2") FUN <- function(X, T, a) exp((1 + a) * log(replace(T, 0, 1)) - a * log(X))

@@ -1,3 +1,5 @@
+# `tranSurv` 1.2.3
+  	* Update maintainer email
 # `tranSurv` 1.2.2
   	* Add optim() in search and update searching algorithm
 	* Fixed bugs in piecewise models

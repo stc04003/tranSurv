@@ -89,7 +89,7 @@ cKendall <- function(trun, obs, delta = NULL, method = "MB",
     out <- NULL
     out$Call <- match.call()
     n <- length(trun)
-    if (class(trans) == "character") {
+    if (inherits(trans, "character")) {
         if (trans == "linear") FUN <- function(X, T, a) (T + a * X) / (1 + a)
         if (trans == "log") FUN <- function(X, T, a) exp((log(replace(T, 0, 1)) + a * log(X)) / (1 + a))
         if (trans == "log2") FUN <- function(X, T, a) exp((1 + a) * log(replace(T, 0, 1)) - a * log(X))

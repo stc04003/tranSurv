@@ -124,7 +124,8 @@ trFit.adjust <- function(DF, engine, stdErr) {
             else covs <- ta
             tmp <- coxph(Surv(ta, obs1, delta1) ~
                              as.matrix(DF[delta == 1, engine@vNames]) + covs,
-                         weights = 1 / wgtX, robust = FALSE, control = coxph.control(timefix = FALSE))
+                         weights = 1 / wgtX, robust = FALSE,
+                         control = coxph.control(timefix = FALSE))
             if (see) {
                 return(min(sum(coef(tmp)[-(1:length(engine@vNames))]^2, na.rm = TRUE), 1e4))
             } else {
@@ -370,7 +371,7 @@ setMethod("trFit", signature(engine = "adjust2", stdErr = "bootstrap"), trFit.bo
 #' }
 #'
 #' 
-#' @importFrom survival is.Surv coxph
+#' @importFrom survival is.Surv coxph coxph.control
 #' @importFrom methods getClass
 #' @seealso \code{\link{trSurvfit}}
 #' 
@@ -389,7 +390,7 @@ trReg <- function(formula, data, subset, tFun = "linear",
     stdErr <- do.call("new", c(list(Class = "bootstrap"), stdErr.control))
     stdErr@B <- B
     if (B == 0) class(stdErr)[[1]] <- "NULL"
-    if (class(tFun) == "character") {
+    if (inherits(tFun, "character")) {
         if (tFun == "linear") engine@tFun <- function(X, T, a) (T + a * X) / (1 + a)
         if (tFun == "log") engine@tFun <- function(X, T, a) exp((log(replace(T, 0, 1)) + a * log(X)) / (1 + a))
         if (tFun == "log2") engine@tFun <- function(X, T, a) exp((1 + a) * log(replace(T, 0, 1)) - a * log(X))

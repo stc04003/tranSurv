@@ -30,7 +30,7 @@ void uCondKendall(double *x, double *y, int *n, double *out) {
 void condKendallC(double *t1, double *t2, double *d, int *n, double *weights, 
 		    int *meth, double *out) {
   int i, j;
-  double *bb = Calloc(*n * (*n - 1), double);
+  double *bb = calloc(*n * (*n - 1), sizeof(double));
   double Uc = 0.0; 
   double Um = 0.0; 
   double tmp = 0.0;
@@ -74,7 +74,7 @@ void condKendallC(double *t1, double *t2, double *d, int *n, double *weights,
     v2 = 0.0;
   }
   out[1] = v * n[0] * (n[0] - 1) / (Um * Um * (n[0] - 2));
-  Free(bb);
+  free(bb);
 }
 
 // conditionaled Product-moment correlation coefficient for UNCENSORED data
