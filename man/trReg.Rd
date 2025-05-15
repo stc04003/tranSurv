@@ -46,7 +46,7 @@ When \code{B = 0} (default), the bootstrap standard errors will not be computed.
   \item{\code{G}}{The number of grids used in the search for the transformation parameter; default is 50.
 A smaller \code{G} could results in faster search, but might be inaccurate.}
   \item{\code{Q}}{The number of cutpoints for the truncation time used when \code{method = "adjust"}. The default is 0.}
-  \item{\code{P}}{The number of breakpoints to divide the event times into equally spaced segmenets.
+  \item{\code{P}}{The number of breakpoints to divide the event times into equally spaced segments.
 When \code{P > 1}, the latent truncation time, \eqn{T'(a)} will be computed in each subset.
 The transformation model is then applied to the aggregated data.} 
   \item{\code{a}}{The transformation parameter. When this is specified, the transformation model is applied based on the specified \code{a}.
@@ -62,7 +62,7 @@ The default value is half the CPU cores on the current host.}
 \details{
 The main assumption on the structural transformation model is that it assumes there is a latent, quasi-independent truncation time
 that is associated with the observed dependent truncation time, the event time, and an unknown dependence parameter
-through a specified funciton.
+through a specified function.
 The structure of the transformation model is of the form:
 \deqn{h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),} where \eqn{T} is the truncation time, \eqn{X} is the observed failure time,
 \eqn{U} is the transformed truncation time that is quasi-independent from \eqn{X} and \eqn{h(\cdot)} is a monotonic transformation function.

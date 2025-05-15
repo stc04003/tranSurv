@@ -28,7 +28,7 @@ A list containing the following elements
 Provide goodness-of-fit diagnostics for the transformation model.
 }
 \details{
-The googness of fit assessment of the transformation model focus on the structure of the
+The goodness of fit assessment of the transformation model focus on the structure of the
 transformation model, which has the form:
 \deqn{h(U) = (1 + a)^{-1} \times (h(T) + ah(X)),}
 where \eqn{T} is the truncation time, \eqn{X} is the observed failure time,
@@ -39,7 +39,7 @@ the structure of the transformation model implies
 \deqn{X - T = -(1 + a) E(U) + (1 + a) X - (1 + a) \times [U - E(U)] := \beta_0 + \beta_1X + \epsilon.}
 The regression estimates can be obtained by the left-truncated regression model (Karlsson and Lindmark, 2014).
 To evaluate the goodness of fit of the transformation model,
-the \code{gof()} function directly test the inearity in \eqn{X} by considering larger model that are nonlinear in \eqn{X}.
+the \code{gof()} function directly test the linearity in \eqn{X} by considering larger model that are nonlinear in \eqn{X}.
 In particular, we expand the covariates \eqn{X} to \code{P} piecewise linearity terms and test for equality of the associated coefficients.
 }
 \examples{
