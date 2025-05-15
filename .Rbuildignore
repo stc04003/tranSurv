@@ -10,3 +10,9 @@ skip-check*
 ^vignettes$
 ^CRAN-RELEASE$
 ^cran-comments\.md$
+^CRAN-SUBMISSION$
+^\.git$
+^\.github$
+^\.Rhistory$
+.github
+\.tar\.gz$
