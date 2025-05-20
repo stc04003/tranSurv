@@ -1,5 +1,5 @@
 Package: tranSurv
-Title: Transformation Model Based Estimation of Survival and Regression Under Dependent Truncation and Independent Censoring
+Title: Transformation-Based Regression under Dependent Truncation
 Version: 1.2.3
 Authors@R: c(person(given = "Sy Han (Steven)", family = "Chiou",
 	     email = "schiou@smu.edu",

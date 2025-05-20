@@ -22,6 +22,8 @@ A list containing the following elements
 \describe{
   \item{coefficients}{the regression coefficients of the left-truncated regression model.}
   \item{pval}{the p-value for the equality of the piecewise linearity terms in the expanded model. See \bold{Details}.}
+  \item{input}{the class of the inputted object, \code{x}.}
+  \item{dat.gof}{a data frame used in fitting the inputted model \code{x}.}
 }
 }
 \description{

@@ -376,6 +376,21 @@ setMethod("trFit", signature(engine = "adjust2", stdErr = "bootstrap"), trFit.bo
 #' @seealso \code{\link{trSurvfit}}
 #' 
 #' @export
+#'
+#' @return A \code{trReg} object containing the following components:
+#' \describe{
+#'   \item{\code{PE}}{A named numeric matrix of point estimates and related statistics (e.g., coefficient, exponentiated coefficient, standard error, z-score, and p-value).}
+#'   \item{\code{varNames}}{Character string giving the name(s) of the covariates.}
+#'   \item{\code{SE}}{A numeric vector contains the bootstrap standard error.}
+#'   \item{\code{a}}{Estimated transformation parameter.}
+#'   \item{\code{Call}}{The matched call to the fitting function.}
+#'   \item{\code{B}, \code{Q}, \code{P}}{Model parameters; \code{B} is the bootstrap sapmle, \code{Q} is the number of cutpoints, and \code{P} is the number of break points. See \bold{Details}.}
+#'   \item{\code{tFun}}{A function defining the transformation model.}
+#'   \item{\code{vNames}}{Character vector of covariate names.}
+#'   \item{\code{method}}{Character string specifying the estimation method (e.g., \code{"kendall"} or \code{"adjust"}).}
+#'   \item{\code{.data}}{A data frame used in fitting.}
+#' }
+#' 
 #' @example inst/examples/ex_trReg.R
 trReg <- function(formula, data, subset, tFun = "linear",
                   method = c("kendall", "adjust"),

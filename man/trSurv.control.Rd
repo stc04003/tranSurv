@@ -17,6 +17,9 @@ trSurv.control(
 
 \item{upper}{the upper end-point of the interval to be searched.}
 }
+\value{
+A list containing the upper and lower bounds in fitting.
+}
 \description{
 Auxiliary function as user interface for \code{trSurvfit} fitting.
 }

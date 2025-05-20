@@ -236,6 +236,8 @@ trSurvfit <- function(trun, obs, delta = NULL, tFun = "linear", plots = FALSE,
 #' @param lower the lower end-point of the interval to be searched.
 #' @param upper the upper end-point of the interval to be searched.
 #'
+#' @return A list containing the upper and lower bounds in fitting.
+#' 
 #' @export
 #' @seealso \code{\link{trSurvfit}}
 trSurv.control <- function(interval = c(-1, 20), lower = min(interval), upper = max(interval)) {

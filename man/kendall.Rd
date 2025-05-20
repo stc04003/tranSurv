@@ -13,6 +13,8 @@ kendall(x, y = NULL)
 }
 \value{
 The output is a numeric value for the unconditional Kendall's tau.
+
+A numeric value representing the unconditional Kendall's tau.
 }
 \description{
 Computes the unconditional Kendall's tau

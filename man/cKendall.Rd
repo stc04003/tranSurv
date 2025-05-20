@@ -48,6 +48,9 @@ See \code{?tranSurvfit} for the transformation model structure.}
 
 \item{...}{for future methods.}
 }
+\value{
+A numeric value representing the unconditional Kendall's tau.
+}
 \description{
 Computes the conditional Kendall's tau and inference
 }

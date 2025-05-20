@@ -33,12 +33,14 @@ globalVariables(c("start", "status")) ## global variables for gof()
 #' @importFrom utils combn
 #' @importFrom graphics boxplot
 #' @importFrom methods is
-#'
+#' 
 #' @references Karlsson, M., Lindmark, A. (2014) truncSP: An R Package for Estimation of Semi-Parametric Truncated Linear Regression Models, \emph{Journal of Statistical Software}, \bold{57} (14), pp 1--19.
 #' @return A list containing the following elements
 #' \describe{
 #'   \item{coefficients}{the regression coefficients of the left-truncated regression model.}
 #'   \item{pval}{the p-value for the equality of the piecewise linearity terms in the expanded model. See \bold{Details}.}
+#'   \item{input}{the class of the inputted object, \code{x}.}
+#'   \item{dat.gof}{a data frame used in fitting the inputted model \code{x}.}
 #' }
 gof <- function(x, B = 200, P = 1) {
     if (all(!is.trReg(x), !is.trSurvfit(x), !is.Surv(x)))

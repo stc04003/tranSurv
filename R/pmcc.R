@@ -15,7 +15,9 @@
 #'   \item{exp}{exponential transformation structure.}
 #' }
 #'
-#' @seealso \code{\link{trSurvfit}}
+#' @return A numeric value representing the product-moment correlation coefficient.
+#'
+#' #' @seealso \code{\link{trSurvfit}}
 #' @export
 #' @example inst/examples/ex_pmcc.R
 pmcc <- function(trun, obs, a = 0, trans = "linear") {

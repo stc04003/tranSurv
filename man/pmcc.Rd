@@ -22,6 +22,11 @@ See \code{?tranSurvfit} for the transformation model structure.}
   \item{exp}{exponential transformation structure.}
 }}
 }
+\value{
+A numeric value representing the product-moment correlation coefficient.
+
+#' @seealso \code{\link{trSurvfit}}
+}
 \description{
 \code{pmcc} computes the conditional product-moment correlation coefficient proposed by Chen et al. (1996).
 The conditional product-moment correlation coefficient uses only the uncensored events.
@@ -30,7 +35,4 @@ The conditional product-moment correlation coefficient uses only the uncensored 
 data(channing, package = "boot")
 chan <- subset(channing, sex == "Male" & entry < exit & cens == 1)
 with(chan, pmcc(entry, exit)) ## cannot handle right censored data
-}
-\seealso{
-\code{\link{trSurvfit}}
 }

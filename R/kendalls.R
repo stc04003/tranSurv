@@ -13,6 +13,9 @@
 #' @export
 #' @references Kendall, M. G. (1938), A new measure of rank correlation, \emph{Biometrika}, 81--93.
 #' @seealso \code{\link{cor}}
+#'
+#' @return A numeric value representing the unconditional Kendall's tau.
+#' 
 #' @example inst/examples/ex_kendalls.R
 kendall <- function(x, y = NULL) {
     if (is.null(y)) {
@@ -75,6 +78,8 @@ kendall <- function(x, y = NULL) {
 #' @param ... for future methods.
 #' @export
 #'
+#' @return A numeric value representing the unconditional Kendall's tau.
+#' 
 #' @seealso \code{\link{trSurvfit}}
 #' @references  Martin E. and Betensky R. A. (2005), Testing quasi-independence of failure and truncation times via conditional Kendall's tau,
 #' \emph{Journal of the American Statistical Association}, \bold{100} (470): 484-492.
