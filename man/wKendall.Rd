@@ -17,6 +17,9 @@ denote events.}
 
 \item{weights}{an optional perturbation weights.}
 }
+\value{
+A numeric value representing the weighted conditional Kendall's tau.
+}
 \description{
 This is function computes the perturbed version of the conditional Kendall's tau.
 }

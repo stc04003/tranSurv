@@ -9,6 +9,8 @@
 #' denote events.
 #' @param weights an optional perturbation weights.
 #' 
+#' @return A numeric value representing the weighted conditional Kendall's tau.
+#'
 #' @export
 #' @example inst/examples/ex_wKendall.R
 wKendall <- function(trun, obs, delta = NULL, weights = NULL) {
