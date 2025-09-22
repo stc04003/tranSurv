@@ -1,6 +1,6 @@
 Package: tranSurv
 Title: Transformation-Based Regression under Dependent Truncation
-Version: 1.2.3
+Version: 1.2.4
 Authors@R: c(person(given = "Sy Han (Steven)", family = "Chiou",
 	     email = "schiou@smu.edu",
 	     role = c("aut", "cre")),

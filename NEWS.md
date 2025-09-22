@@ -1,3 +1,5 @@
+# `tranSurv` 1.2.4
+  	* Resubmit after truncSP
 # `tranSurv` 1.2.3
   	* Update maintainer email
 # `tranSurv` 1.2.2
